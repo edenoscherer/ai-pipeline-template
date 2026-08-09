@@ -1,0 +1,31 @@
+# Gerado pelo pipeline — nunca comitar
+
+# Permissões e configuração local do Claude Code — frequentemente
+# acumula comandos com credenciais em texto puro (ex.: senhas de
+# banco de dev embutidas em allowlist de Bash) conforme o histórico
+# de uso cresce. NUNCA versionar.
+.claude/settings.local.json
+.cursor/settings.local.json
+
+# Segredos e variáveis de ambiente
+.env
+.env.local
+.env.*.local
+
+# Dependências e build (ajuste conforme o ecossistema do projeto)
+node_modules/
+dist/
+build/
+.next/
+__pycache__/
+*.pyc
+
+# Editor / SO
+.DS_Store
+.vscode/
+.idea/
+
+# NOTA: .pipeline/state/*.json é intencionalmente COMITADO, não
+# ignorado — é o que permite retomar uma feature em outra máquina ou
+# sessão (ver .pipeline/feature-state.schema.md). Não adicione
+# .pipeline/state/ a este arquivo.
