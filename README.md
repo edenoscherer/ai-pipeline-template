@@ -99,6 +99,14 @@ você ainda não tem `config.md` nenhum, está literalmente começando o
 projeto, e quer discutir antes de ter qualquer artefato pra
 formalizar.
 
+**Versão web**: existe uma segunda cópia deste skill, adaptada para
+uso no Claude web (sem acesso a filesystem), mantida **fora deste
+repositório** — em sincronia manual, não automática. Se um dia ela for
+trazida para dentro do repo (ex.: `docs/software-dev-panel-web.md` ou
+similar), a ordem do bootstrap em "Gerar Arquivos Iniciais de
+Projeto" precisa ser sincronizada com a versão Claude Code acima
+(`product.md` primeiro).
+
 ## O arquivo `roadmap.md`
 
 Diferente de `<ESTADO_DIR>/*.json` (estado técnico detalhado, um por

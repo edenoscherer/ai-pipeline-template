@@ -31,10 +31,16 @@ texto deste comando.
 2. Gere um nome curto (2-4 palavras, formato ação-substantivo) a partir
    da descrição recebida (ou já lida do roadmap).
 3. Verifique se já existe `<ESTADO_DIR>/<slug>.json` para essa feature.
-   - Se existir: leia `feature_dir` e `current_phase`. Se
-     `current_phase` não for `specify`, informe o usuário que a feature
-     já avançou e pergunte se ele quer mesmo revisar a spec ou retomar
-     a fase atual.
+   - Se existir: leia `feature_dir` e `current_phase`.
+     - Se `current_phase` for `blocked`/`cancelled`/`failed`: informe
+       o usuário com o `status_detail` registrado (ex.: "Esta feature
+       está bloqueada: `<status_detail>`. Resolva o bloqueio antes de
+       continuar, ou peça explicitamente para sair do estado de
+       exceção.") — não ofereça "revisar a spec" como se fosse
+       progresso normal.
+     - Caso contrário, se `current_phase` não for `specify`: informe
+       o usuário que a feature já avançou e pergunte se ele quer mesmo
+       revisar a spec ou retomar a fase atual.
    - Se não existir: determine o próximo número sequencial disponível
      em `SPECS_DIR`, crie `<SPECS_DIR>/<NNN>-<slug>/`, e crie o arquivo
      de estado conforme `.pipeline/feature-state.schema.md`.
