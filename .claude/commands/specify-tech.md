@@ -98,5 +98,12 @@ Idêntico ao Passo 5 do `/specify`: atualizar `<ESTADO_DIR>/<slug>.json`
 condicional a `COMMIT_POR_FASE`, e avançar automaticamente se
 `MODO_EXECUCAO: encadeado`.
 
+## Estado de exceção (a qualquer momento)
+
+Mesmo mecanismo do `/specify` ("Estado de exceção" ao final daquele
+comando): se o usuário sinalizar explicitamente bloqueio, cancelamento
+ou falha, grave `current_phase` e `status_detail` de acordo, sem tocar
+`phases_completed`/`phases_pending`, e sem inferir a condição sozinho.
+
 Priorize diagnóstico preciso, escopo delimitado e critérios que a fase
 de implementação possa verificar objetivamente.

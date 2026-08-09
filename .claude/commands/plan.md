@@ -20,6 +20,25 @@ Leia `.pipeline/config.md`. Leia obrigatoriamente `ARQUIVO_REGRAS` e
   regras do zero para saber disso; referencie os pontos relevantes
   diretamente no plano.
 
+## Pré-condições
+
+Antes de iniciar, verifique nesta ordem. Se qualquer uma falhar, pare
+e reporte exatamente qual falhou — não prossiga nem tente adivinhar.
+
+1. `.pipeline/config.md` existe?
+2. `<ESTADO_DIR>/<slug>.json` existe para esta feature?
+3. `current_phase` não é `blocked`/`cancelled`/`failed`?
+4. `phases_completed` inclui `specify`?
+5. `spec.md` existe em `feature_dir`?
+
+Se alguma condição falhar, reporte assim:
+```
+❌ Não é possível executar /plan.
+<motivo específico — ex.: "current_phase é blocked (status_detail:
+<motivo>) — resolva o bloqueio antes de continuar" ou "spec.md não
+encontrado em <feature_dir>">
+```
+
 ## Passo 1 — Carregar contexto
 
 1. Leia `<ESTADO_DIR>/<slug>.json` para obter `feature_dir`.
@@ -68,6 +87,17 @@ observabilidade que o Dev deve respeitar.
    ```
 3. Se `MODO_EXECUCAO: encadeado`, avance para `/tasks`. Caso contrário,
    reporte a conclusão e pare.
+
+## Estado de exceção (a qualquer momento)
+
+Se durante a execução o usuário sinalizar explicitamente que a feature
+deve ser bloqueada, cancelada, ou que a tentativa atual falhou, grave
+`current_phase` como `blocked`/`cancelled`/`failed` e preencha
+`status_detail` com o motivo em 1 frase — sem mexer em
+`phases_completed`/`phases_pending`. Nunca infira essa condição
+sozinho. Atualize a linha no `ARQUIVO_ROADMAP` (se configurado) com o
+símbolo correspondente (ver legenda em `.pipeline/roadmap.md`),
+reporte e pare.
 
 Priorize consistência arquitetural e rastreabilidade com a spec — o Dev
 deve conseguir "só seguir o plano" e estar em conformidade com as

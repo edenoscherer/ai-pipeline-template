@@ -17,6 +17,26 @@ Leia `.pipeline/config.md`.
 - Para cada comportamento relevante da spec deve haver task(s) de
   teste: caso feliz, edge cases, erros e validações.
 
+## Pré-condições
+
+Antes de iniciar, verifique nesta ordem. Se qualquer uma falhar, pare
+e reporte exatamente qual falhou — não prossiga nem tente adivinhar.
+
+1. `.pipeline/config.md` existe?
+2. `<ESTADO_DIR>/<slug>.json` existe para esta feature?
+3. `current_phase` não é `blocked`/`cancelled`/`failed`?
+4. `phases_completed` inclui `plan`?
+5. Pelo menos um artefato de design do `/plan` existe em `feature_dir`
+   (`research.md`, `data-model.md`, `contracts/` ou `quickstart.md`)?
+
+Se alguma condição falhar, reporte assim:
+```
+❌ Não é possível executar /tasks.
+<motivo específico — ex.: "current_phase é tasks, mas /plan ainda não
+foi concluído" ou "nenhum artefato de design encontrado em
+<feature_dir> — rode /plan primeiro">
+```
+
 ## Passo 1 — Carregar contexto
 
 Leia `<ESTADO_DIR>/<slug>.json` → `feature_dir`. Leia `spec.md`,
@@ -51,7 +71,9 @@ Todo conteúdo em `IDIOMA_ARTEFATOS`.
 ## Passo 4 — Fechamento de fase
 
 1. Atualize `<ESTADO_DIR>/<slug>.json`: `tasks` → `phases_completed`,
-   `current_phase` → `implement`, atualize `last_updated`.
+   `current_phase` → `implement`, atualize `last_updated`. Preencha
+   `task_progress.total` com o número de tasks geradas em `tasks.md`
+   (`task_progress.completed` e `task_progress.failed` começam em `0`).
 2. Se `COMMIT_POR_FASE: true`:
    ```bash
    git add <feature_dir>/tasks.md
@@ -59,6 +81,17 @@ Todo conteúdo em `IDIOMA_ARTEFATOS`.
    ```
 3. Se `MODO_EXECUCAO: encadeado`, avance para `/implement`. Caso
    contrário, reporte a conclusão e pare.
+
+## Estado de exceção (a qualquer momento)
+
+Se durante a execução o usuário sinalizar explicitamente que a feature
+deve ser bloqueada, cancelada, ou que a tentativa atual falhou, grave
+`current_phase` como `blocked`/`cancelled`/`failed` e preencha
+`status_detail` com o motivo em 1 frase — sem mexer em
+`phases_completed`/`phases_pending`. Nunca infira essa condição
+sozinho. Atualize a linha no `ARQUIVO_ROADMAP` (se configurado) com o
+símbolo correspondente (ver legenda em `.pipeline/roadmap.md`),
+reporte e pare.
 
 Priorize que o Dev consiga ler, executar e atender exatamente à spec e
 ao plano, com cobertura de testes clara.

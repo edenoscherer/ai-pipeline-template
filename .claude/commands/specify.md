@@ -85,5 +85,17 @@ Antes de dar a spec por concluída, verifique:
    sem esperar confirmação. Caso contrário, reporte a conclusão
    (caminho da spec, resumo do checklist) e pare.
 
+## Estado de exceção (a qualquer momento)
+
+Se durante a execução o usuário sinalizar explicitamente que a feature
+deve ser bloqueada, cancelada, ou que a tentativa atual falhou (ex.:
+"marca como bloqueada, estou esperando aprovação de X"), grave
+`current_phase` como `blocked`/`cancelled`/`failed` e preencha
+`status_detail` com o motivo em 1 frase — sem mexer em
+`phases_completed`/`phases_pending`. Nunca infira essa condição
+sozinho. Atualize a linha no `ARQUIVO_ROADMAP` (se configurado) com o
+símbolo correspondente (ver legenda em `.pipeline/roadmap.md`),
+reporte e pare.
+
 Priorize clareza para stakeholders e uma base sólida para quem vai
 planejar e implementar depois.

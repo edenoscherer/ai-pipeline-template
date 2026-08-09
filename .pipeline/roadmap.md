@@ -42,10 +42,19 @@ um roadmap mais simples, sem fases.
 - 🔲 **Pendente** — ainda sem `/specify` (ou `/specify-tech`) rodado
 - 🟡 **Em andamento** — alguma fase (`specify`/`plan`/`tasks`/`implement`/`review`) já rodou, mas não concluiu o ciclo
 - ✅ **Concluído** — PR revisada, aprovada e mergeada (`review-pr` Etapa 8 já rodou)
+- 🚧 **Bloqueado** — `current_phase: blocked` no estado da feature (ver `status_detail` no JSON ou `/pipeline-status` para o motivo)
+- ⛔ **Cancelado** — `current_phase: cancelled`
+- ❌ **Falhou** — `current_phase: failed`
+
+Os três últimos são mapeamento direto do `current_phase` de exceção em
+`<ESTADO_DIR>/<slug>.json` (ver "Estados de exceção" em
+`.pipeline/feature-state.schema.md`) — nunca setados manualmente aqui
+sem o estado correspondente refletir o mesmo valor.
 
 ## Notas
 
 - A numeração (`#`) segue a mesma sequência usada em `<SPECS_DIR>/<NNN>-<slug>/`
   — não pule números nem reordene depois de atribuídos.
-- Se uma spec for cancelada ou adiada, não delete a linha — marque como
-  `⛔ Cancelado` ou `⏸ Adiado` e mantenha o histórico visível.
+- Se uma spec for cancelada, bloqueada ou falhar, não delete a linha —
+  marque com o símbolo correspondente da legenda e mantenha o
+  histórico visível.

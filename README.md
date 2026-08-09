@@ -21,6 +21,7 @@ para evitar essas duas falhas se repetirem.
   feature-state.schema.md      # formato do estado por feature
   quality-gates.md             # comandos de verificação (preencher)
   roadmap.md                   # lista mestre de specs (opcional, mas recomendado)
+  version                      # versão do template (semver, ver seção própria)
   state/                       # gerado automaticamente, um json por feature
 docs/
   features/
@@ -36,6 +37,7 @@ docs/
     review-pr.md
     pipeline-status.md
     docs-sync.md
+    pipeline-doctor.md
   skills/
     clarification-protocol/    # lógica de perguntas compartilhada por
       SKILL.md                 # specify e specify-tech (evita duplicação)
@@ -50,7 +52,8 @@ Nenhum comando deste pacote precisa rodar como **subagent**
 devolvem um resultado final, o que quebraria os pontos de interação que
 o pipeline depende (perguntas de clarificação em `/specify`, revisão de
 plano/tasks antes de avançar, aprovação obrigatória em `/review-pr`).
-Comando direto é a escolha certa para todos os 7.
+Comando direto é a escolha certa para todos os 9 (os 7 de fluxo mais
+`/pipeline-status` e `/pipeline-doctor`, ambos somente leitura).
 
 Já a **Skill** `clarification-protocol` existe porque `/specify` e
 `/specify-tech` precisam do mesmo processo de pergunta (recomendação +
@@ -165,6 +168,87 @@ do `software-dev-panel` — gerados sob demanda quando fizer sentido
 (auditoria, onboarding, maturidade do produto), não a cada feature ou
 bug fix.
 
+## Seis mecanismos de robustez (e por que existem)
+
+O fluxo linear `specify → plan → tasks → implement → review` assume o
+caminho feliz. Os seis pontos abaixo foram adicionados para cobrir o
+que acontece quando a realidade não coopera — sem introduzir métricas
+automáticas do pipeline nem uma pasta `schemas/` separada para os
+artefatos: a estrutura de `spec.md`/`tasks.md`/relatório de review
+continua vivendo dentro dos comandos que os produzem, pelo mesmo motivo
+que `clarification-protocol` existe como skill compartilhada em vez de
+arquivo de referência — duplicar a definição em outro lugar só recria
+um problema de sincronização manual que este pacote já evitou.
+
+### Estados de exceção (`blocked` / `cancelled` / `failed`)
+
+`current_phase` só descrevia progresso linear — uma feature esperando
+aprovação externa ficava indistinguível, no estado, de uma em andamento
+normal. Os três estados de exceção (mais o campo `status_detail`, ver
+`.pipeline/feature-state.schema.md`) dão um lugar formal para isso,
+mas **só entram a pedido explícito do usuário** — nenhum comando
+infere sozinho que algo está bloqueado. Mapeiam diretamente para
+símbolos no roadmap (`🚧`/`⛔`/`❌`), então a visão agregada também
+reflete a exceção sem precisar reler cada `feature-state.json`.
+
+### Pré-condições explícitas
+
+Antes, cada comando lia o estado da feature e seguia em frente
+implicitamente — se `/implement` rodasse numa feature cujo `/tasks`
+não tinha terminado, o comportamento dependia do modelo "perceber"
+isso sozinho no meio da execução. Agora `plan`, `tasks`, `implement` e
+`review-pr` abrem com uma seção `## Pré-condições`: uma checagem
+numerada que bloqueia com mensagem clara em vez de deixar o modelo
+decidir se pode prosseguir. `review-pr` é o único caso especial: PRs
+sem `feature-state.json` associado (hotfix direto, contribuição
+externa) não são bloqueadas — o comando avisa que a PR está fora do
+pipeline e segue o review normalmente, só pulando a Etapa 8 (pós-merge,
+que depende de estado).
+
+### `task_progress` separado do estado da feature
+
+`current_phase` diz em que fase a feature está, mas não quanto do
+`tasks.md` já foi executado — antes, a única fonte disso era contar
+`[X]` manualmente dentro do arquivo. `task_progress` (`total` /
+`completed` / `failed`, irmão de `quality_gates_status` no schema) dá
+esse número em `/pipeline-status` sem precisar abrir `tasks.md`, e
+`/implement` para a execução e reporta imediatamente quando uma task
+não-`[P]` falha, em vez de tentar seguir adiante com uma dependência
+quebrada.
+
+### `/pipeline-doctor`
+
+Os outros 8 comandos verificam o progresso de uma **feature**;
+nenhum verificava a saúde da **configuração do pipeline em si** depois
+de copiado para um projeto novo — arquivo de regras apontando para um
+caminho que não existe, `quality-gates.md` esquecido com `<preencher>`
+sem editar, um comando ou skill que sumiu na cópia. `/pipeline-doctor`
+é somente leitura, não avança nenhuma feature, e degrada graciosamente
+nos mesmos pontos em que o resto do pipeline já degrada (regras/
+arquitetura ausentes viram `⚠`, não erro fatal).
+
+### Versionamento (`.pipeline/version`)
+
+Sem uma versão, uma mudança incompatível no formato de
+`feature-state.schema.md` (ou em qualquer contrato lido por mais de um
+comando) não tem como ser detectada por quem já tem features em
+andamento com o schema antigo. `.pipeline/version` (semver: MAJOR para
+schema incompatível, MINOR para campo novo opcional, PATCH para
+correção sem mudar formato) é o registro mínimo disso — e o primeiro
+arquivo que uma futura rotina de migração deveria ler, se este pacote
+um dia precisar de uma.
+
+### Review estruturado — evidência mecânica vs. julgamento
+
+O relatório de `/review-pr` misturava, na mesma prosa, "o typecheck
+passou" (fato verificável, resultado de rodar um comando) com "a
+arquitetura está ok" (avaliação do revisor). O bloco YAML na Etapa 5
+(`quality_gates` vs. `review_judgment`) separa as duas proveniências
+sem fingir que a segunda deixou de exigir julgamento — segurança e
+arquitetura continuam não sendo determinísticas por natureza; a
+mudança é só rastreabilidade de qual parte do relatório é fato e qual
+é opinião fundamentada.
+
 ## Adoção em um projeto novo
 
 1. Copie `.gitignore`, `.pipeline/` e `.claude/` (ou `.cursor/`)
@@ -193,7 +277,11 @@ bug fix.
 4. Se for usar `ARQUIVO_ROADMAP`, preencha `.pipeline/roadmap.md` com
    as specs já planejadas (ou deixe o `software-dev-panel` gerar isso
    ao final de uma discussão de fundação — ver seção abaixo).
-5. **Nunca edite os arquivos dentro de `.claude/commands/`** para
+5. Rode `/pipeline-doctor` para confirmar que a configuração está
+   correta antes de rodar `/specify` pela primeira vez — ele aponta
+   caminhos configurados que não existem, comandos/skills que faltaram
+   na cópia, e `quality-gates.md` ainda com `<preencher>`.
+6. **Nunca edite os arquivos dentro de `.claude/commands/`** para
    inserir conteúdo específico do projeto (stack, exemplos de código,
    nome de módulos). Se sentir essa necessidade, é sinal de que a
    informação deveria estar em `ARQUIVO_REGRAS` ou
@@ -232,6 +320,7 @@ bug fix.
 /review-pr <número da PR>                 → review + aprovação humana + merge tracking
 /docs-sync <slug>                         → atualiza docs/features/ (roda automático no review-pr)
 /pipeline-status                          → visão geral de todas as features
+/pipeline-doctor                          → saúde da configuração do pipeline em si (somente leitura)
 ```
 
 ## Princípios de design (por que está assim)

@@ -19,6 +19,33 @@ pergunte ao usuário qual PR revisar.
 
 ---
 
+## Pré-condições
+
+Antes de iniciar, verifique nesta ordem. Se qualquer uma falhar, pare
+e reporte exatamente qual falhou — não prossiga nem tente adivinhar.
+
+1. `.pipeline/config.md` existe?
+2. Argumento de PR válido (número, `número owner/repo`, ou URL), ou
+   determinável via `gh repo view` quando ausente?
+3. Existe `<ESTADO_DIR>/<slug>.json` associado à branch desta PR?
+   - **Se não existir**: esta é uma PR fora do pipeline (hotfix direto,
+     contribuição externa). Reporte `⚠ PR fora do pipeline — nenhum
+     estado de feature associado à branch <branch>` e siga com o review
+     normalmente — apenas pule a Etapa 8 (pós-merge), que depende de
+     estado.
+   - **Se existir**, verifique também:
+     4. `current_phase` não é `blocked`/`cancelled`/`failed`?
+     5. `phases_completed` inclui `implement`?
+
+Se 4 ou 5 falharem, reporte assim:
+```
+❌ Não é possível executar /review-pr.
+<motivo específico — ex.: "current_phase é tasks, mas /implement ainda
+não foi concluído para esta feature">
+```
+
+---
+
 ## Etapa 1 — Identificar repositório e PR
 
 Se owner/repo não informado, execute `gh repo view --json nameWithOwner`
@@ -76,6 +103,42 @@ em `ARQUIVO_REGRAS`.
 ---
 
 ## Etapa 5 — Montar o relatório de review
+
+Antes da prosa, monte um bloco estruturado separando duas proveniências
+de informação diferentes — não é uma tentativa de eliminar julgamento
+da revisão (segurança e arquitetura exigem julgamento humano/LLM por
+natureza, isso não muda), é rastreabilidade de qual parte é fato
+verificável e qual é avaliação:
+
+```yaml
+quality_gates:
+  typecheck: pass | fail | not_run
+  test: pass | fail | not_run
+  lint: pass | fail | not_run
+  build: pass | fail | not_run
+review_judgment:
+  security: pass | flagged
+  architecture: pass | flagged
+  functionality: pass | flagged
+  quality: pass | flagged
+```
+
+- **`quality_gates`** reflete **evidência mecânica**: o resultado real
+  de rodar os comandos definidos em `ARQUIVO_QUALITY_GATES` (ou o que
+  `/implement` já registrou em `quality_gates_status`, se a PR foi
+  produzida por este pipeline). Nunca infira ou assuma um valor aqui —
+  um gate não definido no projeto, ou não executado, é `not_run`,
+  nunca `pass`.
+- **`review_judgment`** reflete a **avaliação do revisor** sobre os
+  quatro eixos analisados na Etapa 4. `flagged` = há pelo menos um
+  problema relevante identificado naquele eixo (ver comentários por
+  arquivo); `pass` = nenhum problema relevante encontrado. Diferente
+  de `quality_gates`, isto não é determinístico — é julgamento, e
+  continua sendo.
+
+A recomendação de merge (abaixo) é decidida a partir dos dois blocos
+juntos, mas agora com rastreabilidade de qual parte é fato mecânico e
+qual é opinião do revisor.
 
 ```
 ## Review — PR #[N]: [título]
@@ -154,7 +217,10 @@ usuário confirmar que a PR foi de fato mergeada.
 1. Atualizar `<ESTADO_DIR>/<slug>.json`: `review` → `phases_completed`,
    `current_phase` → `done`, atualize `last_updated`.
 2. Se `ARQUIVO_ROADMAP` estiver configurado, atualizar a linha desta
-   feature para ✅ Concluído.
+   feature para ✅ Concluído. (Se em vez de merge o usuário sinalizar
+   que a feature foi bloqueada/cancelada/falhou, use o mapeamento de
+   estados de exceção — ver `.pipeline/feature-state.schema.md` e a
+   legenda em `.pipeline/roadmap.md` — em vez desta etapa.)
 3. Se `ARQUIVO_DECISIONS_LOG` estiver configurado: leia a seção
    "Decisões durante a implementação" do `research.md` da feature (se
    existir e tiver conteúdo) e adicione uma entrada nova em
