@@ -80,22 +80,24 @@ precisa trazer mais gente pra discussão — você não precisa escolher
 antecipadamente entre "pergunta rápida" e "convocar todo mundo".
 
 **Portabilidade**: assim como os comandos, ele nunca tem stack ou
-domínio de negócio escrito no próprio texto — lê `ARQUIVO_REGRAS` e
-`ARQUIVO_ARQUITETURA` (via `.pipeline/config.md`) em tempo real. Isso
-permite manter uma única cópia dele em `~/.claude/skills/` (global,
-segue você entre todos os projetos) sem precisar editar o arquivo a
-cada projeto novo — só a seção "Sobre Você" (nível, preferências
-pessoais) é conteúdo fixo, porque isso legitimamente não muda entre
-projetos.
+domínio de negócio escrito no próprio texto — lê `ARQUIVO_REGRAS`,
+`ARQUIVO_ARQUITETURA` e `ARQUIVO_PRODUTO` (via `.pipeline/config.md`)
+em tempo real. Isso permite manter uma única cópia dele em
+`~/.claude/skills/` (global, segue você entre todos os projetos) sem
+precisar editar o arquivo a cada projeto novo — só a seção "Sobre
+Você" (nível, preferências pessoais) é conteúdo fixo, porque isso
+legitimamente não muda entre projetos.
 
 **Fecha o loop com o pipeline**: ao final de uma discussão, o painel
 pergunta se você quer formalizar como `/specify`, `/specify-tech`, ou
 — se a conversa foi sobre fundar um projeto do zero — gerar os
-arquivos iniciais (`ARQUIVO_REGRAS`, `ARQUIVO_ARQUITETURA` e
-`.pipeline/config.md`) diretamente a partir do que foi decidido. Isso
-cobre o cenário que os comandos formais não cobrem: você ainda não tem
-`config.md` nenhum, está literalmente começando o projeto, e quer
-discutir antes de ter qualquer artefato pra formalizar.
+arquivos iniciais (`ARQUIVO_PRODUTO`, `ARQUIVO_REGRAS`,
+`ARQUIVO_ARQUITETURA` e `.pipeline/config.md`, incluindo o
+`product.md` de visão de produto) diretamente a partir do que foi
+decidido. Isso cobre o cenário que os comandos formais não cobrem:
+você ainda não tem `config.md` nenhum, está literalmente começando o
+projeto, e quer discutir antes de ter qualquer artefato pra
+formalizar.
 
 ## O arquivo `roadmap.md`
 
@@ -255,6 +257,12 @@ mudança é só rastreabilidade de qual parte do relatório é fato e qual
    inteiros para o novo projeto — se o projeto já tiver um
    `.gitignore`, apenas mescle as entradas em vez de sobrescrever.
 2. Edite **apenas** `.pipeline/config.md`:
+   - `ARQUIVO_PRODUTO` — aponte para o documento de visão de produto
+     (problema, público-alvo, diferencial, escopo de MVP). Lido por
+     `/specify` e pelo `software-dev-panel`, não pelos comandos
+     técnicos. Se ainda não existir, crie-o separadamente (mesma
+     lógica de `ARQUIVO_REGRAS`/`ARQUIVO_ARQUITETURA` abaixo) ou deixe
+     vazio se o projeto não quiser manter esse documento.
    - `ARQUIVO_REGRAS` e `ARQUIVO_ARQUITETURA` — aponte para os
      documentos de constitution/arquitetura do projeto. Se ainda não
      existirem, crie-os separadamente (não fazem parte deste pacote —
@@ -290,10 +298,11 @@ mudança é só rastreabilidade de qual parte do relatório é fato e qual
 
 ## O que fica de fora deste pacote (de propósito)
 
-- **`constitution.md` / `docs/arquitetura.md`** — conteúdo específico
-  de cada projeto, não fazem parte da metodologia. (Podem ser gerados
-  pelo próprio `software-dev-panel` na opção "Arquivos Iniciais de
-  Projeto", mas o conteúdo em si nasce da discussão, não do pacote.)
+- **`docs/product.md` / `constitution.md` / `docs/arquitetura.md`** —
+  conteúdo específico de cada projeto, não fazem parte da metodologia.
+  (Podem ser gerados pelo próprio `software-dev-panel` na opção
+  "Arquivos Iniciais de Projeto", mas o conteúdo em si nasce da
+  discussão, não do pacote.)
 - **Consultor técnico especializado em referências de mercado** (o
   equivalente a `tech-expert.md` visto em projetos reais) — fica de
   fora porque normalmente é invocado como subagent dedicado por outro

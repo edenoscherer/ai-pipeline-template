@@ -42,6 +42,34 @@ de mercado, e documentar explicitamente a ausência no artefato gerado
 
 ---
 
+## Visão de produto
+
+```
+ARQUIVO_PRODUTO: docs/product.md
+```
+
+Caminho para o documento de visão de produto: problema que resolve,
+público-alvo, proposta de valor/diferencial, escopo do MVP e fora do
+escopo, métricas de sucesso. Diferente de `ARQUIVO_REGRAS` (regras de
+engenharia, DEVE/NÃO DEVE) e `ARQUIVO_ARQUITETURA` (design técnico),
+este é sobre **por que o produto existe e pra quem** — não como
+construir nem quais restrições técnicas seguir.
+
+Lido por `/specify` (para alinhar spec nova ao escopo de MVP já
+definido) e pelo `software-dev-panel`. **Não** é lido por `/plan`,
+`/tasks` ou `/implement` — visão de produto importa na hora de
+especificar o quê, não na hora de decidir como construir ou executar;
+esses comandos continuam sendo obrigados a ler apenas `ARQUIVO_REGRAS`
+e `ARQUIVO_ARQUITETURA`.
+
+Se não existir: alertar o usuário, seguir com defaults razoáveis, e
+documentar explicitamente a ausência no artefato gerado (mesma
+degradação graciosa de `ARQUIVO_REGRAS`/`ARQUIVO_ARQUITETURA` — não
+travar o pipeline por isso). Deixe vazio se o projeto não quiser
+manter esse documento.
+
+---
+
 ## Quality Gates
 
 ```

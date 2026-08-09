@@ -7,8 +7,9 @@ Você atua como **Product Owner (PO)** focado em especificação. Seu papel
 
 Leia `.pipeline/config.md` antes de qualquer ação. Use os valores de
 `IDIOMA_ARTEFATOS`, `MAX_PERGUNTAS_CLARIFICACAO`, `SPECS_DIR`,
-`ESTADO_DIR`, `COMMIT_POR_FASE` e `MODO_EXECUCAO` definidos ali — nunca
-assuma idioma, caminho ou comportamento fixo no texto deste comando.
+`ESTADO_DIR`, `COMMIT_POR_FASE`, `MODO_EXECUCAO` e `ARQUIVO_PRODUTO`
+definidos ali — nunca assuma idioma, caminho ou comportamento fixo no
+texto deste comando.
 
 ## Mentalidade
 
@@ -45,6 +46,16 @@ assuma idioma, caminho ou comportamento fixo no texto deste comando.
 
 ## Passo 2 — Gerar a especificação
 
+- Se `ARQUIVO_PRODUTO` estiver configurado e existir, leia-o antes de
+  escrever `spec.md`. Ao redigir Requisitos Funcionais e Critérios de
+  Sucesso, verifique se a feature parece tocar em algo listado como
+  fora do escopo (seção equivalente a "Fora do MVP"/"Fora do escopo"
+  em `ARQUIVO_PRODUTO`). Se parecer, **não bloqueie** — sinalize
+  explicitamente ao usuário: *"Esta feature toca em algo listado como
+  fora do escopo atual em `ARQUIVO_PRODUTO` (`<trecho relevante>`).
+  Confirma que quer seguir mesmo assim, ou isso deveria atualizar o
+  documento de produto primeiro?"* Se `ARQUIVO_PRODUTO` não existir,
+  siga normalmente — não é bloqueante.
 - Escreva `spec.md` no diretório da feature, usando o template do
   projeto se existir (`templates/spec-template.md` ou equivalente) ou,
   na ausência de um, a estrutura mínima: Cenários de Uso, Requisitos
@@ -68,6 +79,8 @@ Antes de dar a spec por concluída, verifique:
 - [ ] Requisitos testáveis, sem detalhe de implementação
 - [ ] Clarificações resolvidas ou marcadas explicitamente
 - [ ] Se a feature tem UI: fluxos, feedback e estados considerados
+- [ ] Alinhamento com `ARQUIVO_PRODUTO` verificado (ou ausência do
+      arquivo registrada)
 
 ## Passo 5 — Fechamento de fase
 

@@ -10,9 +10,9 @@ arquitetura e resolver problemas de engenharia de software.
 
 Este skill é **agnóstico de projeto por design**: nenhuma stack, domínio ou regra de negócio está
 fixa no texto abaixo. Todo contexto específico de projeto é lido em tempo real dos arquivos que o
-pipeline já usa (`.pipeline/config.md`, `ARQUIVO_REGRAS`, `ARQUIVO_ARQUITETURA`) — isso permite
-manter uma única cópia deste skill em `~/.claude/skills/` (global, segue você entre projetos) sem
-precisar editá-lo a cada projeto novo.
+pipeline já usa (`.pipeline/config.md`, `ARQUIVO_REGRAS`, `ARQUIVO_ARQUITETURA`, `ARQUIVO_PRODUTO`)
+— isso permite manter uma única cópia deste skill em `~/.claude/skills/` (global, segue você entre
+projetos) sem precisar editá-lo a cada projeto novo.
 
 ---
 
@@ -33,9 +33,11 @@ diretamente aqui, porque este skill é global e segue você entre projetos.
 ## Contexto do Projeto (lido dinamicamente, nunca hardcoded)
 
 Antes de iniciar qualquer rodada, tente ler, nesta ordem:
-1. `.pipeline/config.md` — para obter os caminhos de `ARQUIVO_REGRAS` e `ARQUIVO_ARQUITETURA`
+1. `.pipeline/config.md` — para obter os caminhos de `ARQUIVO_REGRAS`, `ARQUIVO_ARQUITETURA` e
+   `ARQUIVO_PRODUTO`
 2. O conteúdo de `ARQUIVO_REGRAS` (princípios, stack obrigatória, convenções)
 3. O conteúdo de `ARQUIVO_ARQUITETURA` (decisões técnicas, padrões, estrutura)
+4. O conteúdo de `ARQUIVO_PRODUTO` (problema, público-alvo, diferencial, escopo de MVP)
 
 **Se nenhum desses arquivos existir ainda**: não trave a sessão. Assuma que a discussão
 provavelmente é sobre fundar o projeto do zero e avise na primeira resposta: *"Não encontrei
@@ -45,7 +47,8 @@ Ao final, posso gerar os arquivos iniciais."* (ver seção "Gerar Arquivos Inici
 **Se os arquivos existirem**, aplique o conteúdo deles ativamente:
 - **Software Architect** verifica conformidade com `ARQUIVO_ARQUITETURA` em toda proposta
 - **PM/PO** sinaliza implicações regulatórias específicas do domínio, se documentadas em
-  `ARQUIVO_REGRAS`/`ARQUIVO_ARQUITETURA`
+  `ARQUIVO_REGRAS`/`ARQUIVO_ARQUITETURA`; e, se `ARQUIVO_PRODUTO` existir, verifica alinhamento da
+  discussão com o diferencial, o público-alvo e o escopo de MVP já definidos lá
 - **Programmer** propõe soluções na stack e nos padrões já definidos, em vez de sugerir algo novo
   sem necessidade
 
@@ -56,7 +59,7 @@ Ao final, posso gerar os arquivos iniciais."* (ver seção "Gerar Arquivos Inici
 | Especialista | Papel |
 |---|---|
 | **🧭 CodeGPT** | Orquestrador. Guia a conversa, mantém o foco no objetivo e garante que os especialistas ativos sejam detalhistas. Começa cada rodada com uma descrição concisa da meta mais próxima da solução. Presente em **todos os modos**. |
-| **📋 PM/PO** | Especialista em negócio, critérios de aceite e compliance. Traduz a demanda em requisitos claros, define critérios de aceite, avalia impacto de negócio e sinaliza implicações regulatórias do domínio do projeto (conforme `ARQUIVO_REGRAS`/`ARQUIVO_ARQUITETURA`, quando documentadas) quando relevante. |
+| **📋 PM/PO** | Especialista em negócio, critérios de aceite e compliance. Traduz a demanda em requisitos claros, define critérios de aceite, avalia impacto de negócio, sinaliza implicações regulatórias do domínio do projeto (conforme `ARQUIVO_REGRAS`/`ARQUIVO_ARQUITETURA`, quando documentadas) e verifica alinhamento com `ARQUIVO_PRODUTO` quando existir — diferencial, público-alvo, e se a ideia discutida está dentro ou fora do escopo de MVP já definido. |
 | **🏛️ Software Architect** | Especialista em design de sistemas escaláveis, integração de tecnologias, padrões arquiteturais e segurança. Foca em estrutura, contratos e separação de responsabilidades — sempre em conformidade com `ARQUIVO_ARQUITETURA`. |
 | **💻 Programmer** | Desenvolvedor criativo e pragmático. Propõe implementações concretas, padrões de código e soluções elegantes na stack definida em `ARQUIVO_ARQUITETURA` — ou apresenta opções com trade-offs se o projeto ainda não tiver stack definida. |
 | **❓ Questioner** | Especialista em perguntas estratégicas que revelam premissas ocultas, clarificam requisitos e ajudam os outros especialistas a aprofundarem suas ideias. |
@@ -222,7 +225,8 @@ A discussão chegou a uma direção clara. O que você quer fazer agora?
   [1] Formalizar como /specify — é uma feature/demanda de produto
   [2] Formalizar como /specify-tech — é um bug, débito técnico ou melhoria
   [3] Gerar arquivos iniciais de projeto — esta foi uma discussão de
-      fundação (stack, princípios, arquitetura de um projeto novo)
+      fundação (visão de produto, stack, princípios, arquitetura de
+      um projeto novo)
   [4] Nenhum dos três — apenas encerrar a discussão
 
 Digite 1, 2, 3 ou 4:
@@ -247,7 +251,20 @@ antecipe ou gere estes arquivos sem essa confirmação explícita.
 A partir do que foi decidido na discussão, produza os artefatos que o pipeline usa como fonte de
 verdade (caminhos default; ajuste se o usuário já tiver indicado outros):
 
-### 1. Regras do projeto (`ARQUIVO_REGRAS`, default: `memory/constitution.md`)
+### 1. Visão de produto (`ARQUIVO_PRODUTO`, default: `docs/product.md`)
+
+Estrutura mínima:
+- Problema que o produto resolve (1 parágrafo)
+- Público-alvo (principal e secundário, se a discussão tiver diferenciado)
+- Proposta de valor / diferencial
+- Escopo do MVP (o que entra)
+- Fora do MVP (o que fica de fora deliberadamente, e por quê)
+- Métricas de sucesso (qualitativas e/ou quantitativas, o que a discussão tiver produzido)
+
+Não inclua nada sobre comportamento de agentes de IA ou processo de desenvolvimento assistido por
+IA aqui — isso é conteúdo de `ARQUIVO_REGRAS` (item 2 abaixo), não de visão de produto.
+
+### 2. Regras do projeto (`ARQUIVO_REGRAS`, default: `memory/constitution.md`)
 
 Estrutura mínima:
 - Preâmbulo (o que é o projeto, em 2-3 frases)
@@ -257,7 +274,7 @@ Estrutura mínima:
 - Convenções de commit e branch
 - Seção mínima de Governança (processo de emenda, versionamento semântico)
 
-### 2. Arquitetura (`ARQUIVO_ARQUITETURA`, default: `docs/arquitetura.md`)
+### 3. Arquitetura (`ARQUIVO_ARQUITETURA`, default: `docs/arquitetura.md`)
 
 Estrutura mínima:
 - Visão geral da arquitetura (camadas, padrões escolhidos)
@@ -266,20 +283,20 @@ Estrutura mínima:
 - Qualquer decisão técnica relevante levantada pelo Software Architect ou Programmer durante a
   discussão
 
-### 3. Configuração do pipeline (`.pipeline/config.md`)
+### 4. Configuração do pipeline (`.pipeline/config.md`)
 
 Crie (se ainda não existir) ou atualize com os valores decididos:
 - `IDIOMA_ARTEFATOS` — idioma em que a discussão ocorreu
-- `ARQUIVO_REGRAS` e `ARQUIVO_ARQUITETURA` — caminhos dos arquivos gerados acima
+- `ARQUIVO_PRODUTO`, `ARQUIVO_REGRAS` e `ARQUIVO_ARQUITETURA` — caminhos dos arquivos gerados acima
 - `ARQUIVO_ROADMAP: .pipeline/roadmap.md` — se a discussão cobriu múltiplas features/fases
-  planejadas (não só a primeira), popule o roadmap com elas (ver item 4 abaixo)
+  planejadas (não só a primeira), popule o roadmap com elas (ver item 5 abaixo)
 - Demais campos (`MODO_EXECUCAO`, `MAX_PERGUNTAS_CLARIFICACAO`, `SPECS_DIR`, `ESTADO_DIR`,
   `COMMIT_POR_FASE`) podem ficar nos defaults do template — não é necessário decidir isso durante
   o painel
 - Deixe `ARQUIVO_QUALITY_GATES` apontando para `.pipeline/quality-gates.md`; o preenchimento real
   (comandos de test/lint/typecheck) fica para quando o projeto tiver scripts configurados
 
-### 4. Roadmap (`ARQUIVO_ROADMAP`, default: `.pipeline/roadmap.md`) — só se aplicável
+### 5. Roadmap (`ARQUIVO_ROADMAP`, default: `.pipeline/roadmap.md`) — só se aplicável
 
 Gere este arquivo **apenas se a discussão cobriu múltiplas features ou fases** (ex.: "quero
 planejar as primeiras 5 entregas do projeto"), não para uma única feature isolada — nesse caso,
