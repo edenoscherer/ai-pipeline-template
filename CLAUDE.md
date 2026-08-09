@@ -20,15 +20,20 @@ O desenho responde a duas falhas reais observadas em pipelines em produção: co
 
 ## Trabalhando neste repo (sem build/test/lint)
 
-Não há comandos de qualidade de código para rodar aqui — mudanças são validadas lendo o markdown, não executando nada. Quando pedirem para "adotar este pipeline" em um projeto-alvo, o procedimento é:
-
-1. Copiar `.gitignore`, `.pipeline/` e `.claude/` (ou `.cursor/`) inteiros para o projeto-alvo (mesclar entradas do `.gitignore` se já existir um lá).
-2. Editar **apenas** `.pipeline/config.md` no projeto-alvo (idioma, caminhos dos docs de regras/arquitetura, modo de execução, etc.).
-3. Preencher `.pipeline/quality-gates.md` com os comandos reais de typecheck/test/lint/build daquele projeto.
-4. Opcionalmente popular `.pipeline/roadmap.md` com specs planejadas.
-5. **Nunca** editar `.claude/commands/*.md` para injetar conteúdo específico de projeto (stack, exemplos de código, nomes de módulo). Se um comando parecer precisar disso, a informação pertence a `ARQUIVO_REGRAS`/`ARQUIVO_ARQUITETURA` (docs próprios do projeto-alvo) — é isso que mantém o pacote portável para o *próximo* projeto também.
+Não há comandos de qualidade de código para rodar aqui — mudanças são validadas lendo o markdown, não executando nada. Quando pedirem para "adotar este pipeline" em um projeto-alvo, o procedimento completo (o que copiar, o que **não** copiar, e os passos de configuração) está em [INSTALL.md](INSTALL.md) — não repita esse conteúdo aqui nem no README. O ponto mais importante dele: nunca copie o `CLAUDE.md` deste repositório para um projeto-alvo (ele descreve *este* repo de autoria, não o projeto); use `CLAUDE.example.md` como ponto de partida do `CLAUDE.md` de lá.
 
 Neste repositório especificamente, `.pipeline/config.md` ainda aponta para placeholders (`memory/constitution.md`, `docs/arquitetura.md`) que não existem, e `.pipeline/quality-gates.md` tem células `<preencher>` não preenchidas — isso é esperado para o template em si, não é um bug a corrigir.
+
+### Como validar uma mudança (não há testes automatizados)
+
+Sem build/lint/test, a verificação de uma edição é manual, por leitura e grep:
+
+- **Numeração sequencial**: checklists numerados (as verificações de `pipeline-doctor.md`, os passos de cada comando) precisam continuar sequenciais depois de inserir/remover um item — confira com grep após editar, incluindo o exemplo de saída e a aritmética do "X% saudável (N/M)" em `pipeline-doctor.md`.
+- **Referências cruzadas em vez de duplicação**: quando um comando referencia a lógica de outro (ex.: `specify-tech.md` aponta para "Passo 1 do `/specify`" em vez de repetir o texto), releia o trecho referenciado depois de editá-lo para confirmar que a referência ainda descreve o comportamento real.
+- **Escopo de leitura por comando**: ao adicionar/alterar um campo em `.pipeline/config.md`, grep nos comandos que **não** devem lê-lo para garantir que não vazou (ex.: `ARQUIVO_PRODUTO` é exclusivo de `/specify` e `software-dev-panel` — não deve aparecer em `plan.md`/`tasks.md`/`implement.md`/`specify-tech.md`).
+- **`.pipeline/version`**: mudança que altera o schema de `feature-state.json`, adiciona/remove campo de config, ou corrige comportamento de um comando deve vir com um bump em `.pipeline/version` (MAJOR/MINOR/PATCH — ver seção "Versionamento" no `README.md`).
+- **Mensagens de commit**: seguem Conventional Commits (`tipo(escopo): descrição`, ex.: `feat(config): ...`, `fix(pipeline): ...`), um commit por mudança lógica completa.
+- **`README.md` e `CLAUDE.example.md`**: ao editar um comando ou skill de forma que mude comportamento visível de fora (novo campo de config, novo comando, regra não-configurável nova), confira se `README.md` e `CLAUDE.example.md` — os dois documentos que descrevem o pacote para quem está fora deste repo, e o único dos dois que viaja para o projeto-alvo — ainda estão corretos.
 
 ## Arquitetura
 

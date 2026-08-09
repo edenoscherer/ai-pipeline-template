@@ -68,8 +68,7 @@ problema.
     ou não houver nenhum doc de domínio ainda, pule esta verificação
     sem contar como falha (nada para checar ainda).
 14. **`.pipeline/version` existe e é legível** — reporte a versão
-    detectada. Ausência conta como não passou (ver
-    `.pipeline/version` e a seção de versionamento do `README.md`).
+    detectada. Ausência conta como não passou.
 
 ## Saída
 

@@ -14,6 +14,10 @@ para evitar essas duas falhas se repetirem.
 ## Estrutura
 
 ```
+README.md                      # este repositório — não copiar (ver INSTALL.md)
+CLAUDE.md                      # orienta o Claude Code NESTE repo — não copiar
+CLAUDE.example.md              # copiar como CLAUDE.md no projeto-alvo
+INSTALL.md                     # manifesto do que copiar/não copiar — não copiar
 .gitignore                     # protege settings.local.json e .env de vazar
 .pipeline/
   config.md                    # único lugar com parâmetros de projeto
@@ -261,48 +265,11 @@ mudança é só rastreabilidade de qual parte do relatório é fato e qual
 
 ## Adoção em um projeto novo
 
-1. Copie `.gitignore`, `.pipeline/` e `.claude/` (ou `.cursor/`)
-   inteiros para o novo projeto — se o projeto já tiver um
-   `.gitignore`, apenas mescle as entradas em vez de sobrescrever.
-2. Edite **apenas** `.pipeline/config.md`:
-   - `ARQUIVO_PRODUTO` — aponte para o documento de visão de produto
-     (problema, público-alvo, diferencial, escopo de MVP). Lido por
-     `/specify` e pelo `software-dev-panel`, não pelos comandos
-     técnicos. Se ainda não existir, crie-o separadamente (mesma
-     lógica de `ARQUIVO_REGRAS`/`ARQUIVO_ARQUITETURA` abaixo) ou deixe
-     vazio se o projeto não quiser manter esse documento.
-   - `ARQUIVO_REGRAS` e `ARQUIVO_ARQUITETURA` — aponte para os
-     documentos de constitution/arquitetura do projeto. Se ainda não
-     existirem, crie-os separadamente (não fazem parte deste pacote —
-     são conteúdo específico de projeto, não metodologia).
-   - `ARQUIVO_ROADMAP` — mantenha `.pipeline/roadmap.md` se quiser
-     rastrear specs planejadas desde o início, ou deixe vazio se
-     preferir decidir isso mais tarde.
-   - `ARQUIVO_DECISIONS_LOG` — mantenha `.pipeline/decisions-log.md`
-     se quiser um histórico agregado de decisões de implementação, ou
-     deixe vazio se preferir manter isso só em `research.md` por
-     feature.
-   - `DOCS_FEATURES_DIR` — mantenha `docs/features/` se quiser
-     documentação viva por módulo, com detecção automática de bugs
-     recorrentes, ou deixe vazio se preferir não manter isso.
-   - `IDIOMA_ARTEFATOS` — ajuste se não for pt-BR.
-   - `MODO_EXECUCAO` — `supervisionado` (default, mais seguro) ou
-     `encadeado` (menos fricção, avança sozinho entre fases).
-3. Preencha `.pipeline/quality-gates.md` com os comandos reais do
-   projeto (typecheck, test, lint, build).
-4. Se for usar `ARQUIVO_ROADMAP`, preencha `.pipeline/roadmap.md` com
-   as specs já planejadas (ou deixe o `software-dev-panel` gerar isso
-   ao final de uma discussão de fundação — ver seção abaixo).
-5. Rode `/pipeline-doctor` para confirmar que a configuração está
-   correta antes de rodar `/specify` pela primeira vez — ele aponta
-   caminhos configurados que não existem, comandos/skills que faltaram
-   na cópia, e `quality-gates.md` ainda com `<preencher>`.
-6. **Nunca edite os arquivos dentro de `.claude/commands/`** para
-   inserir conteúdo específico do projeto (stack, exemplos de código,
-   nome de módulos). Se sentir essa necessidade, é sinal de que a
-   informação deveria estar em `ARQUIVO_REGRAS` ou
-   `ARQUIVO_ARQUITETURA`, não no comando — essa é a regra que garante
-   que este pacote continue portável para o próximo projeto.
+Ver [INSTALL.md](INSTALL.md) — manifesto completo do que copiar, o que
+**não** copiar (incluindo por que `CLAUDE.md` deste repositório nunca
+deve ir para o projeto-alvo), e os passos de configuração depois da
+cópia. `CLAUDE.example.md` é o ponto de partida do `CLAUDE.md` do
+projeto-alvo.
 
 ## O que fica de fora deste pacote (de propósito)
 
