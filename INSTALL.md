@@ -37,6 +37,14 @@ existe para evitar; a informação pertence a `ARQUIVO_REGRAS` ou
 re-copiados por cima quando este template evoluir (`.pipeline/version`
 subir), sem perda de conteúdo do projeto.
 
+**Exceção**: `.claude/skills/software-dev-panel/SKILL.md` tem uma
+seção "Sobre Você" no topo, feita para ser editada **uma vez** com
+contexto pessoal (nível, preferências de comunicação) — não é
+conteúdo de projeto, mas também não deve ser sobrescrita numa
+atualização futura do template como o resto do grupo. Ao re-copiar
+este arquivo por cima numa atualização, preserve manualmente essa
+seção antes de sobrescrever o restante.
+
 ### 2. Esqueleto — copiar e preencher no projeto-alvo
 
 ```
