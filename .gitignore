@@ -4,6 +4,7 @@
 # acumula comandos com credenciais em texto puro (ex.: senhas de
 # banco de dev embutidas em allowlist de Bash) conforme o histórico
 # de uso cresce. NUNCA versionar.
+.claude/settings.json
 .claude/settings.local.json
 .cursor/settings.local.json
 

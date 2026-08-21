@@ -55,6 +55,11 @@ referencia:
   máquina/sessão. Não adicione ao `.gitignore`.
 - `/review-pr` **sempre** exige aprovação humana explícita antes de
   escrever no GitHub, independente de `MODO_EXECUCAO`.
+- O fechamento de uma feature aprovada (estado → `done`, roadmap,
+  decisions-log, docs-sync, documentos de status) entra como commit na
+  própria branch da PR, revisado junto com o resto — nunca como commit
+  direto na branch principal depois do merge. Isso vale com ou sem
+  branch protection ativa.
 - Se houver mais de uma feature em estado ambíguo (`.pipeline/state/`
   com múltiplos arquivos incompletos), pergunte ao usuário qual retomar
   em vez de adivinhar.

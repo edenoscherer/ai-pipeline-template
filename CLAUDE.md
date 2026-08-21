@@ -45,7 +45,7 @@ Sem build/lint/test, a verificação de uma edição é manual, por leitura e gr
 
 Todos rodam como comando direto, deliberadamente **não** como subagent — o pipeline depende de pontos de interação (perguntas de clarificação no `/specify`, revisão de plano/tasks, aprovação obrigatória no `/review-pr`) que um subagent isolado, que só devolve um resultado final, quebraria.
 
-`/plan`, `/tasks`, `/implement` e `/review-pr` abrem com uma seção `## Pré-condições` — checagem explícita e numerada que bloqueia com mensagem clara (qual condição falhou) em vez de o modelo decidir implicitamente se pode prosseguir; `/review-pr` não bloqueia PRs sem `feature-state.json` associado (fora do pipeline), só pula a Etapa 8.
+`/plan`, `/tasks`, `/implement` e `/review-pr` abrem com uma seção `## Pré-condições` — checagem explícita e numerada que bloqueia com mensagem clara (qual condição falhou) em vez de o modelo decidir implicitamente se pode prosseguir; `/review-pr` não bloqueia PRs sem `feature-state.json` associado (fora do pipeline), só segue sem montar/commitar o fechamento da feature (Etapa 5/7), que depende de estado.
 
 | Comando | Papel | Produz | Lê estado, escreve `current_phase` → |
 |---|---|---|---|
@@ -54,9 +54,9 @@ Todos rodam como comando direto, deliberadamente **não** como subagent — o pi
 | `/plan` | Arquiteto — o *como*, validado contra `ARQUIVO_REGRAS`/`ARQUIVO_ARQUITETURA` | `research.md`, `data-model.md`, `contracts/`, `quickstart.md` | `tasks` |
 | `/tasks` | QA/Tech Lead — quebra o plano em tasks ordenadas e testáveis (Setup → Testes → Core → Integração → Polish, ordem TDD, `[P]` para paralelizável); grava `task_progress.total` no estado | `tasks.md` | `implement` |
 | `/implement` | Dev — executa as tasks em ordem, comita por task, roda quality gates, atualiza `task_progress.completed`/`.failed`, registra decisões não previstas em `research.md` | código + commits | `review` |
-| `/review-pr` | Revisor sênior — **sempre** exige aprovação humana explícita antes de escrever no GitHub, independente do `MODO_EXECUCAO`; Etapa 5 separa evidência mecânica (`quality_gates`) de julgamento do revisor (`review_judgment`) num bloco estruturado; pós-merge (Etapa 8) atualiza estado/roadmap/decisions-log/docs-sync | review + rastreio de merge | `done` |
+| `/review-pr` | Revisor sênior — **sempre** exige aprovação humana explícita antes de escrever no GitHub, independente do `MODO_EXECUCAO`; Etapa 5 separa evidência mecânica (`quality_gates`) de julgamento do revisor (`review_judgment`) num bloco estruturado, e monta o fechamento da feature (estado/roadmap/decisions-log/docs-sync) para entrar como commit na própria PR; Etapa 7 commita esse fechamento e submete o review (nunca `event=APPROVE` — autoaprovação retorna 422); Etapa 8 é só fallback para PRs mergeadas fora deste fluxo | review + rastreio de merge | `done` |
 | `/pipeline-status` | Somente leitura. Cruza `<ESTADO_DIR>/*.json` contra `ARQUIVO_ROADMAP`, reporta divergências, progresso de tasks e features em estado de exceção | relatório de status | — |
-| `/docs-sync` | Atualiza incrementalmente `docs/features/<dominio>.md` a partir de uma spec concluída; chamado automaticamente pelo `/review-pr` Etapa 8 | atualização de doc de domínio | — |
+| `/docs-sync` | Atualiza incrementalmente `docs/features/<dominio>.md` a partir de uma spec concluída; chamado automaticamente pelo `/review-pr` Etapa 5 (só os Passos 1-4, sem o commit próprio) | atualização de doc de domínio | — |
 | `/pipeline-doctor` | Somente leitura. Verifica a saúde da **configuração do pipeline em si** (não o progresso de nenhuma feature) — caminhos configurados que existem, quality-gates preenchido, comandos/skills presentes, versão do `.pipeline/version` | relatório de saúde | — |
 
 Todos os cinco comandos que avançam fase (`specify`, `specify-tech`, `plan`, `tasks`, `implement`) reconhecem, a qualquer momento, um pedido explícito do usuário para marcar a feature como `blocked`/`cancelled`/`failed` (`status_detail` com o motivo) — nunca inferem essa condição sozinhos. Ver `feature-state.schema.md`.
@@ -73,7 +73,7 @@ Um JSON por feature ativa — **intencionalmente comitado**, não ignorado pelo 
 ### Três artefatos de "histórico" diferentes — não confundir
 
 - **`.pipeline/roadmap.md`** — visão agregada e legível por humanos de todas as specs planejadas e seu status (🔲/🟡/✅, mais 🚧/⛔/❌ para os estados de exceção — mapeamento direto de `current_phase`), atualizada automaticamente pelos comandos a cada fim de fase. Opcional, mas recomendado desde o início.
-- **`.pipeline/decisions-log.md`** — log cronológico de decisões tomadas *durante a implementação* que não estavam no plano original, adicionado uma vez por spec pelo `/review-pr` Etapa 8 (pós-merge). Lido só sob demanda, nunca carregado automaticamente. Entradas recorrentes aqui são sinal de que o padrão deveria virar princípio formal em `ARQUIVO_REGRAS`.
+- **`.pipeline/decisions-log.md`** — log cronológico de decisões tomadas *durante a implementação* que não estavam no plano original, adicionado uma vez por spec pelo `/review-pr` Etapa 5 (montado na própria PR, antes do merge). Lido só sob demanda, nunca carregado automaticamente. Entradas recorrentes aqui são sinal de que o padrão deveria virar princípio formal em `ARQUIVO_REGRAS`.
 - **`docs/features/<dominio>.md`** — documentação viva do comportamento atual de cada módulo (não histórico), um arquivo por domínio, atualizado incrementalmente por `/docs-sync`. Cada doc mantém uma tabela "Specs Relacionadas" usada pelo `/specify-tech` para detectar bugs recorrentes na mesma área antes de investigar do zero.
 
 ### Regras não-configuráveis (não tornar condicionais ao `MODO_EXECUCAO`)
@@ -81,3 +81,4 @@ Um JSON por feature ativa — **intencionalmente comitado**, não ignorado pelo 
 - `/review-pr` nunca escreve no GitHub sem aprovação explícita do usuário sobre o relatório de review antes.
 - Comandos nunca têm stack/idioma/caminho de projeto hardcoded — sempre resolvem via `.pipeline/config.md`.
 - Quando o estado de feature for ambíguo (múltiplas features em andamento), perguntar ao usuário em vez de adivinhar.
+- O fechamento de uma feature aprovada (estado, roadmap, decisions-log, docs-sync, documentos de status) entra como commit na própria branch da PR (`/review-pr` Etapa 7), revisado junto com o resto — nunca como commit direto na branch principal depois do merge, com ou sem branch protection ativa.
