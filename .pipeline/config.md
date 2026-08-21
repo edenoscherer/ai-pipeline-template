@@ -163,10 +163,10 @@ Caminho para o log agregado de decisões técnicas/produto que
 emergiram durante implementações (principalmente as não previstas no
 plano). Diferente de `ARQUIVO_ROADMAP` (lido a cada execução de
 `/specify`/`/pipeline-status`), este arquivo é atualizado apenas por
-`/review-pr` (pós-merge) e lido só sob demanda — não entra no
-carregamento automático de contexto dos outros comandos. Ver
-`.pipeline/decisions-log.md` para o formato. Deixe vazio se o projeto
-não quiser manter esse histórico.
+`/review-pr` (Etapa 5, montado na própria PR antes do merge) e lido só
+sob demanda — não entra no carregamento automático de contexto dos
+outros comandos. Ver `.pipeline/decisions-log.md` para o formato. Deixe
+vazio se o projeto não quiser manter esse histórico.
 
 ---
 
@@ -180,7 +180,7 @@ Diretório onde a documentação de domínio/funcionalidade é mantida —
 um arquivo por módulo (ex.: `pricing.md`, `accounts.md`), refletindo o
 comportamento **atual**, não o histórico spec por spec. Atualizado
 incrementalmente por `/docs-sync` (chamado automaticamente por
-`/review-pr` na Etapa 8, ou manualmente). Cada doc de domínio mantém
+`/review-pr` na Etapa 5, ou manualmente). Cada doc de domínio mantém
 uma tabela "Specs Relacionadas" — histórico de specs que o tocaram,
 usada para detectar recorrência de bugs (ver `/specify-tech`). Deixe
 vazio se o projeto não quiser manter essa documentação.
@@ -195,8 +195,9 @@ ARQUIVOS_STATUS: []
 
 Lista opcional de documentos de acompanhamento do projeto (ex.:
 `IMPLEMENTATION_STATUS.md`, `FEATURE_LIST.md`) que devem ser
-atualizados na Etapa 8 do `review-pr` (pós-merge). Deixe vazio se o
-projeto não mantiver esse tipo de documento — o pipeline não exige.
+atualizados na Etapa 5 do `review-pr` (montados na própria PR, antes
+do merge). Deixe vazio se o projeto não mantiver esse tipo de
+documento — o pipeline não exige.
 
 Exemplo preenchido:
 ```
