@@ -16,7 +16,8 @@ sem erro.
 ## Quando é chamado
 
 - Automaticamente pelo `/review-pr`, Etapa 5 (montagem do fechamento,
-  antes do merge) — nesse caso, só os Passos 1-3 abaixo são executados;
+  antes do merge) — nesse caso, só os Passos 1-4 abaixo são executados
+  (incluindo a verificação de recorrência do Passo 4, se for bug fix);
   o passo de "Fechamento" (commit) é feito pelo `/review-pr` junto com
   o resto do fechamento, na Etapa 7
 - Manualmente a qualquer momento: `/docs-sync <slug-da-feature>`

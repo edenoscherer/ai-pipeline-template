@@ -163,10 +163,12 @@ Caminho para o log agregado de decisões técnicas/produto que
 emergiram durante implementações (principalmente as não previstas no
 plano). Diferente de `ARQUIVO_ROADMAP` (lido a cada execução de
 `/specify`/`/pipeline-status`), este arquivo é atualizado apenas por
-`/review-pr` (Etapa 5, montado na própria PR antes do merge) e lido só
-sob demanda — não entra no carregamento automático de contexto dos
-outros comandos. Ver `.pipeline/decisions-log.md` para o formato. Deixe
-vazio se o projeto não quiser manter esse histórico.
+`/review-pr` — normalmente na Etapa 5 (montado na própria PR antes do
+merge), ou pela Etapa 8 no caso excepcional de fechamento fora do
+fluxo normal — e lido só sob demanda — não entra no carregamento
+automático de contexto dos outros comandos. Ver
+`.pipeline/decisions-log.md` para o formato. Deixe vazio se o projeto
+não quiser manter esse histórico.
 
 ---
 
