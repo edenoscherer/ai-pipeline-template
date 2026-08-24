@@ -88,18 +88,20 @@ O projeto-alvo não fica sem `CLAUDE.md` por causa disso — ver
 ### 4. Nunca copiar — segurança
 
 ```
+.claude/settings.json
 .claude/settings.local.json
 .cursor/settings.local.json
 .env / .env.local / .env.*.local
 ```
 
 Não fazem parte do pacote em nenhum projeto — são locais de cada
-máquina/desenvolvedor. `.claude/settings.local.json` em particular
-acumula allowlist de comandos Bash que frequentemente embutem
-credenciais em texto puro conforme o histórico de uso cresce (ver
-comentário no `.gitignore` deste repo). Se você clonar este repositório
-inteiro em vez de copiar arquivo por arquivo, confirme que nenhum
-desses três chegou a existir aqui antes de usar o clone como base.
+máquina/desenvolvedor. `.claude/settings.json` e `.claude/settings.local.json`
+em particular acumulam allowlist de comandos Bash que frequentemente
+embutem credenciais em texto puro conforme o histórico de uso cresce
+(ver comentário no `.gitignore` deste repo). Se você clonar este
+repositório inteiro em vez de copiar arquivo por arquivo, confirme que
+nenhum desses quatro chegou a existir aqui antes de usar o clone como
+base.
 
 ## Passos de configuração pós-cópia
 

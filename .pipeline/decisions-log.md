@@ -14,8 +14,9 @@ merece virar princípio formal em `ARQUIVO_REGRAS`. Não é lido
 automaticamente por nenhum comando do pipeline durante a execução
 normal — só quando explicitamente pedido.
 
-Cada spec concluída ganha uma entrada, adicionada pelo `/review-pr`
-(Etapa 8, pós-merge). Decisões antecipadas no planejamento (o caso
+Cada spec concluída ganha uma entrada, montada pelo `/review-pr` na
+Etapa 5 (entra como commit na própria PR, antes do merge). Decisões
+antecipadas no planejamento (o caso
 comum) já ficam documentadas no `research.md` da própria spec — só
 repita aqui o que for relevante além do que já está lá, ou um resumo
 de 1 linha com link/referência se quiser evitar duplicação.

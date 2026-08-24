@@ -41,7 +41,8 @@ um roadmap mais simples, sem fases.
 
 - 🔲 **Pendente** — ainda sem `/specify` (ou `/specify-tech`) rodado
 - 🟡 **Em andamento** — alguma fase (`specify`/`plan`/`tasks`/`implement`/`review`) já rodou, mas não concluiu o ciclo
-- ✅ **Concluído** — PR revisada, aprovada e mergeada (`review-pr` Etapa 8 já rodou)
+- ✅ **Concluído** — PR revisada, com fechamento incluído na própria PR
+  (`review-pr` Etapa 5/7) e mergeada
 - 🚧 **Bloqueado** — `current_phase: blocked` no estado da feature (ver `status_detail` no JSON ou `/pipeline-status` para o motivo)
 - ⛔ **Cancelado** — `current_phase: cancelled`
 - ❌ **Falhou** — `current_phase: failed`

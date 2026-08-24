@@ -138,10 +138,10 @@ que não estavam previstas no plano — deliberadamente separado do
    implementação", preenchida pelo `/implement` quando algo surge fora
    do planejado (workaround de biblioteca, edge case descoberto na
    hora). Fica co-localizado com a spec, sem arquivo novo.
-2. **Agregado**: `/review-pr` (Etapa 8, pós-merge) adiciona uma entrada
-   curta em `.pipeline/decisions-log.md` — um log cronológico de
-   leitura ocasional, não carregado automaticamente por nenhum comando
-   durante execução normal.
+2. **Agregado**: `/review-pr` (Etapa 5, montado na própria PR antes do
+   merge) adiciona uma entrada curta em `.pipeline/decisions-log.md` —
+   um log cronológico de leitura ocasional, não carregado
+   automaticamente por nenhum comando durante execução normal.
 
 O valor do log agregado aparece com o tempo: se o mesmo tipo de
 decisão se repete em várias entradas, é sinal de que deveria virar
@@ -158,8 +158,9 @@ responde uma pergunta diferente: **"como este módulo funciona hoje?"**
 — organizado por domínio, não por ordem cronológica de spec.
 
 - **Criado e atualizado incrementalmente** por `/docs-sync`, chamado
-  automaticamente pelo `/review-pr` (Etapa 8, pós-merge). Nunca
-  regenerado do zero — só a parte afetada pela spec concluída.
+  automaticamente pelo `/review-pr` (Etapa 5, montado na própria PR
+  antes do merge). Nunca regenerado do zero — só a parte afetada pela
+  spec concluída.
 - **Feature nova** → adiciona/atualiza comportamento no doc do domínio.
 - **Bug fix** → corrige o texto que descrevia o comportamento errado,
   e remove de "Limitações conhecidas" o que foi resolvido.
@@ -182,10 +183,10 @@ do `software-dev-panel` — gerados sob demanda quando fizer sentido
 (auditoria, onboarding, maturidade do produto), não a cada feature ou
 bug fix.
 
-## Seis mecanismos de robustez (e por que existem)
+## Sete mecanismos de robustez (e por que existem)
 
 O fluxo linear `specify → plan → tasks → implement → review` assume o
-caminho feliz. Os seis pontos abaixo foram adicionados para cobrir o
+caminho feliz. Os sete pontos abaixo foram adicionados para cobrir o
 que acontece quando a realidade não coopera — sem introduzir métricas
 automáticas do pipeline nem uma pasta `schemas/` separada para os
 artefatos: a estrutura de `spec.md`/`tasks.md`/relatório de review
@@ -216,8 +217,8 @@ numerada que bloqueia com mensagem clara em vez de deixar o modelo
 decidir se pode prosseguir. `review-pr` é o único caso especial: PRs
 sem `feature-state.json` associado (hotfix direto, contribuição
 externa) não são bloqueadas — o comando avisa que a PR está fora do
-pipeline e segue o review normalmente, só pulando a Etapa 8 (pós-merge,
-que depende de estado).
+pipeline e segue o review normalmente, só sem montar/commitar o
+fechamento da feature (Etapa 5/7, que depende de estado).
 
 ### `task_progress` separado do estado da feature
 
@@ -262,6 +263,36 @@ sem fingir que a segunda deixou de exigir julgamento — segurança e
 arquitetura continuam não sendo determinísticas por natureza; a
 mudança é só rastreabilidade de qual parte do relatório é fato e qual
 é opinião fundamentada.
+
+### Fechamento da feature embutido na PR, não pós-merge
+
+A versão original de `/review-pr` commitava o fechamento da feature
+(estado → `done`, roadmap → ✅, decisions-log, docs-sync,
+`ARQUIVOS_STATUS`) **depois** do merge, direto na branch principal.
+Isso quebra em qualquer repositório com branch protection ativa (sem
+commit direto permitido) — mas o problema de fundo não é branch
+protection: um commit de fechamento pós-merge nunca passa por review,
+mesmo em repositórios sem proteção nenhuma. Agora a Etapa 5 monta essas
+mudanças (sem commitar) junto com o relatório, mostrando ao usuário
+exatamente o que vai entrar; a Etapa 7 commita o fechamento na própria
+branch da PR antes de submeter o review ao GitHub. O código e o
+fechamento mergeiam juntos, revisados juntos — não existe mais commit
+silencioso depois do merge no fluxo normal. A Etapa 8 (renomeada para
+"fechamento fora do fluxo normal") vira fallback só para PRs mergeadas
+sem passar pela Etapa 7, e nunca commita direto na branch principal —
+sempre via branch nova + PR própria.
+
+Junto disso, `event=APPROVE` na submissão do review falha com `422
+Review Can not approve your own pull request` sempre que o autor da PR
+é o mesmo usuário autenticado no GitHub — o caso de qualquer
+desenvolvedor solo usando este pipeline. A Etapa 7 usa `event=COMMENT`
+nesse caso (a aprovação real já aconteceu na confirmação do chat,
+Etapa 6); o `state` da review no GitHub ficar `COMMENTED` em vez de
+`APPROVED` não muda a recomendação. Em um repositório com mais de um
+colaborador, a confirmação no chat deixa de bastar sozinha, e a branch
+protection do GitHub deve exigir aprovação humana real de outra pessoa
+antes do merge — configuração de infraestrutura, fora do escopo deste
+comando.
 
 ## Adoção em um projeto novo
 
