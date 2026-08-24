@@ -185,7 +185,7 @@ comportamento.
 
 Se a recomendação **não** for "Bloquear merge", **redija em memória** o
 conteúdo final de cada mudança abaixo — não escreva nada em disco
-ainda. A escrita real dos arquivos acontece só na Etapa 7, passo 1,
+ainda. A escrita real dos arquivos acontece só na Etapa 7, passo 2,
 atomicamente com o commit; se o usuário cancelar na Etapa 6, não há
 nada no working tree para limpar porque nada foi gravado.
 
@@ -208,7 +208,7 @@ nada no working tree para limpar porque nada foi gravado.
    for bug fix) e redija o conteúdo final resultante — **não** execute
    o passo de "Fechamento" de `docs-sync.md` (que faz `git add`/`git
    commit` direto); a escrita e o commit de tudo isso acontecem juntos,
-   na Etapa 7, passo 1, deste comando.
+   na Etapa 7, passo 2, deste comando.
 5. Se `ARQUIVOS_STATUS` não estiver vazio: redija a atualização de cada
    documento listado.
 
@@ -273,41 +273,50 @@ Se o usuário escolher **[3]**: encerrar sem enviar nada.
 
 ## Etapa 7 — Submeter ao GitHub (somente após aprovação explícita)
 
-A escrita do fechamento (redigido em memória na Etapa 5) só acontece
-**depois** de o evento final do review estar decidido — nunca antes.
-Isso evita commitar `done`/✅ na branch e depois descobrir, ao decidir
-o evento, que o review na verdade bloqueia o merge.
+O evento do review é determinado pela recomendação de merge já
+confirmada na Etapa 6 (a Etapa 6 só chega à confirmação depois que
+qualquer edição de comentários já foi refletida na recomendação final
+— nada muda a severidade depois disso):
+
+- **Bloquear merge** → `event=REQUEST_CHANGES`
+- **Aprovar com ressalvas** (médios/baixos) → `event=COMMENT`
+- **Aprovar** (sem problemas significativos) → `event=APPROVE`, **exceto**
+  quando o autor da PR (Etapa 2) for o mesmo usuário autenticado no
+  GitHub (`get_me`, Etapa 2): nesse caso use `event=COMMENT` em vez de
+  `APPROVE` — a API retorna `422 Review Can not approve your own pull
+  request` para autoaprovação. Isso é esperado sempre que o revisor for
+  o próprio autor da PR (o caso comum em projeto solo): a aprovação
+  real já aconteceu no chat (Etapa 6); `event=COMMENT` só registra o
+  conteúdo do review no GitHub — o `state` ficar `COMMENTED` em vez de
+  `APPROVED` não muda a recomendação. Quando o revisor é outra pessoa
+  (repositório com mais de um colaborador), `event=APPROVE` funciona
+  normalmente e deve ser usado — é o que satisfaz uma branch protection
+  que exige aprovação humana real.
+
+A ordem abaixo escreve o fechamento (se houver) **antes** de submeter o
+review, não depois — para o review submetido refletir exatamente o
+que vai para o head da PR, e não ficar potencialmente marcado como
+stale/dismissed por um push de fechamento feito depois da submissão.
+Ao mesmo tempo, como o evento já foi determinado acima, o fechamento só
+é escrito quando o evento não é `REQUEST_CHANGES` — nunca commitamos
+`done`/✅ para descobrir depois que o review bloqueia o merge.
 
 1. Se houver `<ESTADO_DIR>/<slug>.json` associado à PR: checkout da
    branch da PR. Faça isso independentemente de a Etapa 5 ter redigido
    um fechamento — o passo 6 abaixo (commit do relatório) também
    precisa da branch já checked out.
-2. Criar review pendente: `pull_request_review_write` method=`create`
-3. Adicionar comentários por arquivo/linha:
+2. Se o evento **não** for `REQUEST_CHANGES` e a Etapa 5 tiver redigido
+   um fechamento: escreva o conteúdo redigido nos arquivos
+   correspondentes (branch já checked out no passo 1), `git commit -m
+   "docs(<slug>): mark feature as complete"`, push. Se o evento for
+   `REQUEST_CHANGES`: **não escreva nem commite nada do fechamento** —
+   a feature só fecha numa próxima rodada, depois de corrigido e
+   revisado de novo.
+3. Criar review pendente: `pull_request_review_write` method=`create`
+4. Adicionar comentários por arquivo/linha:
    `add_comment_to_pending_review`
-4. Submeter: `pull_request_review_write` method=`submit_pending`,
-   `event=REQUEST_CHANGES` (críticos/altos bloqueantes) ou
-   `event=COMMENT` (demais casos, **incluindo** "sem problemas
-   significativos"). **Nunca use `event=APPROVE`** quando o autor da PR
-   (Etapa 2) for o mesmo usuário autenticado no GitHub (`get_me`,
-   Etapa 2) — a API retorna `422 Review Can not approve your own pull
-   request`. Isso é esperado enquanto o projeto tiver um único
-   colaborador: a aprovação real já aconteceu no chat (Etapa 6);
-   `event=COMMENT` só registra o conteúdo do review no GitHub — o
-   `state` ficar `COMMENTED` em vez de `APPROVED` não muda a
-   recomendação.
-5. Agora, com o evento decidido:
-   - Se `event=REQUEST_CHANGES`: **não escreva nem commite** o
-     fechamento, mesmo que a Etapa 5 o tenha redigido — a feature só
-     fecha numa próxima rodada, depois de corrigido e revisado de novo.
-     (Isso também cobre o caso em que edições feitas na Etapa 6 opção
-     [2] mudaram a severidade efetiva em relação ao que a Etapa 5 usou
-     para redigir: trate como se nenhum fechamento tivesse sido
-     redigido.)
-   - Se `event=COMMENT` e a Etapa 5 redigiu um fechamento: escreva o
-     conteúdo redigido nos arquivos correspondentes (branch já checked
-     out no passo 1), `git commit -m "docs(<slug>): mark feature as
-     complete"`, push.
+5. Submeter: `pull_request_review_write` method=`submit_pending`,
+   `event=<determinado no início desta etapa>`.
 6. Se houver `<ESTADO_DIR>/<slug>.json` associado: commit e push do
    relatório completo em `<SPECS_DIR>/review-pr-[N].md`, mesma branch
    da PR (branch já checked out no passo 1). Se não houver (PR fora do
@@ -324,9 +333,9 @@ efetivo junto com o código — nenhuma ação adicional necessária.
 Use esta etapa **apenas** quando:
 - a PR foi mergeada sem passar pela Etapa 7 (merge manual direto no
   GitHub, ou review feito antes desta versão do comando existir); ou
-- o review anterior foi `REQUEST_CHANGES` e o fechamento foi
-  descartado (Etapa 7, passo 5), mas a PR foi mergeada mesmo assim fora
-  deste fluxo.
+- o review anterior foi `REQUEST_CHANGES` e por isso o fechamento nunca
+  chegou a ser escrito (Etapa 7, passo 2), mas a PR foi mergeada mesmo
+  assim fora deste fluxo.
 
 Nunca execute automaticamente — só com confirmação explícita do usuário
 de que a PR foi mergeada e o fechamento não está refletido na branch
