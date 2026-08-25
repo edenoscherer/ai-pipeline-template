@@ -79,7 +79,10 @@ Todo conteúdo em `IDIOMA_ARTEFATOS`.
    git add <feature_dir>/tasks.md
    git commit -m "docs(<slug>): add tasks"
    ```
-3. Se `MODO_EXECUCAO: encadeado`, avance para `/implement`. Caso
+3. Aplique a skill `linear-sync` (seção "Write-back de progresso") —
+   sem efeito se `linear_issue_id` for `null` ou a integração não
+   estiver disponível.
+4. Se `MODO_EXECUCAO: encadeado`, avance para `/implement`. Caso
    contrário, reporte a conclusão e pare.
 
 ## Estado de exceção (a qualquer momento)
@@ -90,7 +93,9 @@ deve ser bloqueada, cancelada, ou que a tentativa atual falhou, grave
 `status_detail` com o motivo em 1 frase — sem mexer em
 `phases_completed`/`phases_pending`. Nunca infira essa condição
 sozinho. Atualize a linha no `ARQUIVO_ROADMAP` (se configurado) com o
-símbolo correspondente (ver legenda em `.pipeline/roadmap.md`),
+símbolo correspondente (ver legenda em `.pipeline/roadmap.md`), aplique
+a skill `linear-sync` (seção "Estados de exceção" — sem efeito se
+`linear_issue_id` for `null` ou a integração não estiver disponível),
 reporte e pare.
 
 Priorize que o Dev consiga ler, executar e atender exatamente à spec e

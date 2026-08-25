@@ -85,7 +85,10 @@ observabilidade que o Dev deve respeitar.
    git add <feature_dir>/
    git commit -m "docs(<slug>): add implementation plan"
    ```
-3. Se `MODO_EXECUCAO: encadeado`, avance para `/tasks`. Caso contrário,
+3. Aplique a skill `linear-sync` (seção "Write-back de progresso") —
+   sem efeito se `linear_issue_id` for `null` ou a integração não
+   estiver disponível.
+4. Se `MODO_EXECUCAO: encadeado`, avance para `/tasks`. Caso contrário,
    reporte a conclusão e pare.
 
 ## Estado de exceção (a qualquer momento)
@@ -96,7 +99,9 @@ deve ser bloqueada, cancelada, ou que a tentativa atual falhou, grave
 `status_detail` com o motivo em 1 frase — sem mexer em
 `phases_completed`/`phases_pending`. Nunca infira essa condição
 sozinho. Atualize a linha no `ARQUIVO_ROADMAP` (se configurado) com o
-símbolo correspondente (ver legenda em `.pipeline/roadmap.md`),
+símbolo correspondente (ver legenda em `.pipeline/roadmap.md`), aplique
+a skill `linear-sync` (seção "Estados de exceção" — sem efeito se
+`linear_issue_id` for `null` ou a integração não estiver disponível),
 reporte e pare.
 
 Priorize consistência arquitetural e rastreabilidade com a spec — o Dev

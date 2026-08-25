@@ -12,7 +12,8 @@ tempo (arquivo apagado, roadmap movido, etc.).
 Leia `.pipeline/config.md` para obter todos os parâmetros a verificar
 (`IDIOMA_ARTEFATOS`, `SPECS_DIR`, `ESTADO_DIR`, `ARQUIVO_REGRAS`,
 `ARQUIVO_ARQUITETURA`, `ARQUIVO_PRODUTO`, `ARQUIVO_QUALITY_GATES`,
-`ARQUIVO_ROADMAP`, `ARQUIVO_DECISIONS_LOG`, `DOCS_FEATURES_DIR`).
+`ARQUIVO_ROADMAP`, `ARQUIVO_DECISIONS_LOG`, `DOCS_FEATURES_DIR`,
+`LINEAR_ENABLED`, `LINEAR_TEAM_KEY`).
 
 ## Execução
 
@@ -60,7 +61,8 @@ problema.
     `pipeline-status`, `docs-sync`, `pipeline-doctor` — 9 no total.
     Reporte quantos dos 9 foram encontrados.
 12. **Skills esperadas existem em `.claude/skills/`**:
-    `clarification-protocol`, `software-dev-panel` — 2 no total.
+    `clarification-protocol`, `software-dev-panel`, `linear-sync` — 3
+    no total.
 13. **Para cada domínio em `DOCS_FEATURES_DIR`** (se configurado e o
     diretório existir): para cada arquivo `.md` que não seja
     `_template.md`, confirme que contém uma seção "Specs
@@ -69,6 +71,14 @@ problema.
     sem contar como falha (nada para checar ainda).
 14. **`.pipeline/version` existe e é legível** — reporte a versão
     detectada. Ausência conta como não passou.
+15. **Integração Linear** — se `LINEAR_ENABLED: true` em `config.md`,
+    reporte isso como informativo (`✓ Integração Linear habilitada
+    (time: <LINEAR_TEAM_KEY>)`), sem tentar checar conectividade real
+    da tool MCP — isso só é verificável em tempo de execução de outro
+    comando, não estaticamente por este comando somente-leitura. Se
+    `LINEAR_ENABLED: false` ou ausente (default), reporte `—
+    Integração Linear não habilitada` (não conta nem a favor nem
+    contra, mesma regra dos itens 8-10).
 
 ## Saída
 
@@ -87,9 +97,10 @@ problema.
 ✓ decisions-log.md
 ✓ docs/features/
 ✓ Comandos (9/9)
-✓ Skills (2/2)
+✓ Skills (3/3)
 ⚠ docs/features/onboarding.md — sem tabela "Specs Relacionadas"
 ✓ Versão do pipeline: 1.1.1
+— Integração Linear não habilitada
 
 Pipeline: 64% saudável (9/14 verificações passaram)
 ```

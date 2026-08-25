@@ -24,6 +24,7 @@ quatro grupos. Nenhum arquivo fica de fora da lista.
 .claude/commands/pipeline-doctor.md
 .claude/skills/clarification-protocol/SKILL.md
 .claude/skills/software-dev-panel/SKILL.md
+.claude/skills/linear-sync/SKILL.md
 .pipeline/feature-state.schema.md
 .pipeline/version
 ```
@@ -129,6 +130,10 @@ base.
    - `IDIOMA_ARTEFATOS` — ajuste se não for pt-BR.
    - `MODO_EXECUCAO` — `supervisionado` (default, mais seguro) ou
      `encadeado` (avança sozinho entre fases).
+   - `LINEAR_ENABLED`, `LINEAR_TEAM_KEY` e os `LINEAR_LABEL_*` também
+     fazem parte de `.pipeline/config.md` — preencha-os se o projeto
+     usar Linear (ver skill `linear-sync`); deixe `LINEAR_ENABLED:
+     false` (default) se não usar.
 4. Preencha `.pipeline/quality-gates.md` com os comandos reais do
    projeto (typecheck, test, lint, build).
 5. Se for usar `ARQUIVO_ROADMAP`, preencha `.pipeline/roadmap.md` com

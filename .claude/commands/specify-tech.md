@@ -34,8 +34,13 @@ usados pelo `/specify`).
 
 ## Passo 1 — Estado da feature
 
-Mesmo mecanismo do `/specify` (Passo 1): reutilize ou crie
-`<ESTADO_DIR>/<slug>.json` seguindo `.pipeline/feature-state.schema.md`.
+Mesmo mecanismo do `/specify` (Passo 1): aplique a skill `linear-sync`
+(detecção + leitura de card) sobre `$ARGUMENTS` antes de interpretar a
+entrada; se um card for lido, use-o como a descrição do problema dali
+em diante e registre o identificador para `linear_issue_id`. Em
+seguida, reutilize ou crie `<ESTADO_DIR>/<slug>.json` seguindo
+`.pipeline/feature-state.schema.md` (incluindo `linear_issue_id`, se
+aplicável).
 
 ## Passo 2 — Verificação de recorrência
 
@@ -95,7 +100,8 @@ seção de Impacto em vez de ignorar o conflito.
 
 Idêntico ao Passo 5 do `/specify`: atualizar `<ESTADO_DIR>/<slug>.json`
 (`specify` → `phases_completed`, `current_phase` → `plan`), commit
-condicional a `COMMIT_POR_FASE`, e avançar automaticamente se
+condicional a `COMMIT_POR_FASE`, aplicar a skill `linear-sync` (seção
+"Write-back de progresso"), e avançar automaticamente se
 `MODO_EXECUCAO: encadeado`.
 
 ## Estado de exceção (a qualquer momento)
@@ -103,7 +109,9 @@ condicional a `COMMIT_POR_FASE`, e avançar automaticamente se
 Mesmo mecanismo do `/specify` ("Estado de exceção" ao final daquele
 comando): se o usuário sinalizar explicitamente bloqueio, cancelamento
 ou falha, grave `current_phase` e `status_detail` de acordo, sem tocar
-`phases_completed`/`phases_pending`, e sem inferir a condição sozinho.
+`phases_completed`/`phases_pending`, sem inferir a condição sozinho, e
+aplicando a skill `linear-sync` (seção "Estados de exceção") junto da
+atualização do `ARQUIVO_ROADMAP`.
 
 Priorize diagnóstico preciso, escopo delimitado e critérios que a fase
 de implementação possa verificar objetivamente.

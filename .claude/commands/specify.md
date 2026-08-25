@@ -7,9 +7,9 @@ Você atua como **Product Owner (PO)** focado em especificação. Seu papel
 
 Leia `.pipeline/config.md` antes de qualquer ação. Use os valores de
 `IDIOMA_ARTEFATOS`, `MAX_PERGUNTAS_CLARIFICACAO`, `SPECS_DIR`,
-`ESTADO_DIR`, `COMMIT_POR_FASE`, `MODO_EXECUCAO` e `ARQUIVO_PRODUTO`
-definidos ali — nunca assuma idioma, caminho ou comportamento fixo no
-texto deste comando.
+`ESTADO_DIR`, `COMMIT_POR_FASE`, `MODO_EXECUCAO`, `ARQUIVO_PRODUTO`,
+`LINEAR_ENABLED` e `LINEAR_TEAM_KEY` definidos ali — nunca assuma
+idioma, caminho ou comportamento fixo no texto deste comando.
 
 ## Mentalidade
 
@@ -23,14 +23,23 @@ texto deste comando.
 
 ## Passo 1 — Estado da feature e roadmap
 
-1. Se `ARQUIVO_ROADMAP` estiver configurado e o usuário não tiver dado
+1. Aplique a skill `linear-sync` (seção "Detectar referência a um
+   card" e, se detectado, "Ler o card") sobre `$ARGUMENTS`, antes de
+   qualquer outra interpretação da entrada. Se um card for lido, use
+   título + descrição dele como a descrição da feature dali em
+   diante — inclusive como entrada da Clarificação (Passo 3) — e
+   registre o identificador para gravar em `linear_issue_id` na
+   criação do `feature-state.json` (item 3 abaixo). Se nenhum card for
+   detectado, ou a skill degradar (Linear não disponível/habilitado),
+   trate a entrada normalmente como descrição livre.
+2. Se `ARQUIVO_ROADMAP` estiver configurado e o usuário não tiver dado
    uma descrição específica (ex.: pediu só "próxima spec" ou
    "continua o roadmap"), leia `ARQUIVO_ROADMAP` e identifique a
    primeira entrada 🔲 Pendente, na ordem. Use a descrição registrada
    lá como ponto de partida.
-2. Gere um nome curto (2-4 palavras, formato ação-substantivo) a partir
-   da descrição recebida (ou já lida do roadmap).
-3. Verifique se já existe `<ESTADO_DIR>/<slug>.json` para essa feature.
+3. Gere um nome curto (2-4 palavras, formato ação-substantivo) a partir
+   da descrição recebida (ou já lida do roadmap ou do card do Linear).
+4. Verifique se já existe `<ESTADO_DIR>/<slug>.json` para essa feature.
    - Se existir: leia `feature_dir` e `current_phase`.
      - Se `current_phase` for `blocked`/`cancelled`/`failed`: informe
        o usuário com o `status_detail` registrado (ex.: "Esta feature
@@ -43,8 +52,9 @@ texto deste comando.
        revisar a spec ou retomar a fase atual.
    - Se não existir: determine o próximo número sequencial disponível
      em `SPECS_DIR`, crie `<SPECS_DIR>/<NNN>-<slug>/`, e crie o arquivo
-     de estado conforme `.pipeline/feature-state.schema.md`.
-4. Se `ARQUIVO_ROADMAP` estiver configurado e esta feature **não**
+     de estado conforme `.pipeline/feature-state.schema.md` (incluindo
+     `linear_issue_id`, se um card foi lido no item 1).
+5. Se `ARQUIVO_ROADMAP` estiver configurado e esta feature **não**
    tiver uma entrada lá ainda (feature nova, não planejada
    previamente), adicione uma linha com status 🔲 Pendente antes de
    seguir para o Passo 2 — o roadmap deve sempre refletir toda spec
@@ -87,6 +97,8 @@ Antes de dar a spec por concluída, verifique:
 - [ ] Se a feature tem UI: fluxos, feedback e estados considerados
 - [ ] Alinhamento com `ARQUIVO_PRODUTO` verificado (ou ausência do
       arquivo registrada)
+- [ ] Se originada de um card do Linear: critérios de aceite do card
+      refletidos na spec, não apenas título/descrição
 
 ## Passo 5 — Fechamento de fase
 
@@ -100,7 +112,10 @@ Antes de dar a spec por concluída, verifique:
    git add <feature_dir>/ <ESTADO_DIR>/<slug>.json <ARQUIVO_ROADMAP>
    git commit -m "docs(<slug>): add specification"
    ```
-4. Se `MODO_EXECUCAO: encadeado`, avance automaticamente para `/plan`
+4. Aplique a skill `linear-sync` (seção "Write-back de progresso") —
+   sem efeito se `linear_issue_id` for `null` ou a integração não
+   estiver disponível.
+5. Se `MODO_EXECUCAO: encadeado`, avance automaticamente para `/plan`
    sem esperar confirmação. Caso contrário, reporte a conclusão
    (caminho da spec, resumo do checklist) e pare.
 
@@ -113,7 +128,9 @@ deve ser bloqueada, cancelada, ou que a tentativa atual falhou (ex.:
 `status_detail` com o motivo em 1 frase — sem mexer em
 `phases_completed`/`phases_pending`. Nunca infira essa condição
 sozinho. Atualize a linha no `ARQUIVO_ROADMAP` (se configurado) com o
-símbolo correspondente (ver legenda em `.pipeline/roadmap.md`),
+símbolo correspondente (ver legenda em `.pipeline/roadmap.md`), aplique
+a skill `linear-sync` (seção "Estados de exceção" — sem efeito se
+`linear_issue_id` for `null` ou a integração não estiver disponível),
 reporte e pare.
 
 Priorize clareza para stakeholders e uma base sólida para quem vai
