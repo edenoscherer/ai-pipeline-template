@@ -20,6 +20,7 @@ conversa/memória quando o estado já existir.
   "short_name": "user-auth",
   "current_phase": "tasks",
   "status_detail": null,
+  "linear_issue_id": null,
   "phases_completed": ["specify", "plan"],
   "phases_pending": ["tasks", "implement", "review"],
   "clarifications_asked": 2,
@@ -47,6 +48,7 @@ conversa/memória quando o estado já existir.
 | `short_name` | string | Slug usado para nomear o próprio arquivo de estado |
 | `current_phase` | string | Uma de: `specify`, `plan`, `tasks`, `implement`, `review`, `done` (progresso linear) — ou `blocked`, `cancelled`, `failed` (estado de exceção, ver seção própria abaixo) |
 | `status_detail` | string \| null | Motivo em 1 frase. `null` no progresso linear; **obrigatório** quando `current_phase` é `blocked`/`cancelled`/`failed` |
+| `linear_issue_id` | string \| null | Identificador do card do Linear associado (ex.: `EDE-123`). `null` quando a feature não tem card associado ou a integração (`LINEAR_ENABLED`) está desligada |
 | `phases_completed` | string[] | Fases já concluídas, na ordem em que terminaram |
 | `phases_pending` | string[] | Fases restantes, na ordem esperada |
 | `clarifications_asked` | number | Total de perguntas de clarificação já feitas nesta feature (soma entre specify/specify-tech) |
@@ -66,6 +68,9 @@ conversa/memória quando o estado já existir.
    - move a fase de `phases_pending` para `phases_completed`
    - atualiza `current_phase` para a próxima fase pendente
    - atualiza `last_updated`
+   - se `linear_issue_id` não for `null`, aplica a skill `linear-sync`
+     (write-back de progresso) para comentar o avanço no card
+     correspondente
 4. Se houver mais de uma feature com estado incompleto no mesmo
    projeto, `/pipeline-status` lista todas e pede ao usuário para
    indicar qual retomar — nenhum comando deve escolher sozinho qual
@@ -99,5 +104,12 @@ representa apenas "o que ainda não rodou".
    `blocked → 🚧`, `cancelled → ⛔`, `failed → ❌`. O comando que grava
    a exceção também atualiza a linha da feature no roadmap, se
    `ARQUIVO_ROADMAP` estiver configurado.
-5. `/pipeline-status` lista features em estado de exceção separadamente
+5. **Mapeamento para o Linear**: se `linear_issue_id` não for `null`,
+   o comando que grava a exceção também aplica a skill `linear-sync`
+   (seção Estados de exceção) — comenta o `status_detail` no card e
+   aplica `LINEAR_LABEL_BLOCKED`/`LINEAR_LABEL_DECISION_NEEDED`
+   conforme o motivo, mesma mecânica do mapeamento para
+   `ARQUIVO_ROADMAP` acima. Ao sair da exceção, comenta a retomada e
+   remove as labels aplicadas.
+6. `/pipeline-status` lista features em estado de exceção separadamente
    das demais, mostrando `status_detail`.

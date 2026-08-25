@@ -47,6 +47,8 @@ docs/
       SKILL.md                 # specify e specify-tech (evita duplicação)
     software-dev-panel/        # painel de discussão/refinamento — auto-
       SKILL.md                 # disparado por linguagem natural, não por comando
+    linear-sync/                # leitura e write-back opcional de
+      SKILL.md                  # cards do Linear (opt-in)
 ```
 
 ## Por que uma Skill e não um Subagent
@@ -64,6 +66,18 @@ Já a **Skill** `clarification-protocol` existe porque `/specify` e
 tabela + atalho de aceite + limite de perguntas) — mantê-lo como skill
 evita que os dois comandos fiquem com o mesmo texto copiado, e qualquer
 ajuste no protocolo (ex.: mudar o formato da tabela) é feito uma vez só.
+
+Mesmo raciocínio para a skill `linear-sync`, só que compartilhada por
+seis comandos em vez de dois (`specify`, `specify-tech`, `plan`,
+`tasks`, `implement` e `review-pr`): detecção de card, leitura,
+write-back de progresso, mapeamento de estados de exceção e fechamento
+da feature são a mesma lógica em todos eles, então vivem uma vez só na
+skill em vez de repetidas seis vezes. É **opt-in** via `LINEAR_ENABLED`
+em `.pipeline/config.md` (default `false`) — nenhum comando toca o
+Linear a menos que o projeto ligue essa flag explicitamente, e mesmo
+ligada, a skill checa em tempo real se a tool MCP do Linear está
+conectada antes de qualquer leitura ou escrita, degradando
+graciosamente (sem interromper o pipeline) quando não está.
 
 Se sua sessão de `/implement` começar a ficar pesada em projetos com
 muitas tasks, considere rodá-lo como subagent isolado (padrão

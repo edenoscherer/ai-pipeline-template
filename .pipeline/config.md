@@ -207,3 +207,35 @@ ARQUIVOS_STATUS:
   - IMPLEMENTATION_STATUS.md
   - FEATURE_LIST.md
 ```
+
+---
+
+## Integração com Linear (opcional)
+
+```
+LINEAR_ENABLED: false
+LINEAR_TEAM_KEY:
+LINEAR_LABEL_AGENT_TASK: Agent Task
+LINEAR_LABEL_BLOCKED: Blocked
+LINEAR_LABEL_DECISION_NEEDED: Decision Needed
+```
+
+- `LINEAR_ENABLED`: liga/desliga a integração com o Linear. Quando
+  `false` (default), nenhum comando toca o Linear, mesmo que a tool MCP
+  esteja conectada na sessão — a integração é opt-in por configuração,
+  nunca automática por presença da tool.
+- `LINEAR_TEAM_KEY`: prefixo do time no Linear (ex.: `EDE`), usado para
+  reconhecer identificadores nus como `EDE-123` em texto livre como
+  referência a um card. Vazio = só URLs completas do Linear
+  (`linear.app/.../issue/...`) são reconhecidas.
+- `LINEAR_LABEL_AGENT_TASK` / `LINEAR_LABEL_BLOCKED` /
+  `LINEAR_LABEL_DECISION_NEEDED`: nomes exatos das labels do workflow
+  de agente no Linear, ajustáveis por projeto (o workspace do Linear
+  pode nomear essas labels de forma diferente do default sugerido).
+
+A disponibilidade real da integração é checada em **tempo de
+execução**, não só por este arquivo: mesmo com `LINEAR_ENABLED: true`,
+se nenhuma tool MCP do Linear estiver conectada na sessão atual, todo
+comando degrada exatamente como já degrada na ausência de
+`ARQUIVO_REGRAS` — alerta e segue sem tocar o Linear, nunca bloqueia o
+pipeline. Ver skill `linear-sync` para o mecanismo completo.

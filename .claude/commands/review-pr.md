@@ -211,10 +211,14 @@ nada no working tree para limpar porque nada foi gravado.
    na Etapa 7, passo 2, deste comando.
 5. Se `ARQUIVOS_STATUS` não estiver vazio: redija a atualização de cada
    documento listado.
+6. Se `linear_issue_id` não for `null`: aplique a skill `linear-sync`
+   (seção "Fechamento", passo 1) para redigir em memória o comentário
+   de fechamento do card correspondente.
 
 Inclua um resumo dessas mudanças no relatório mostrado ao usuário (diff
-resumido ou lista de arquivos/seções afetadas) — quem revisa precisa
-ver o que vai entrar na PR, não descobrir depois do merge.
+resumido ou lista de arquivos/seções afetadas, mais o comentário de
+fechamento do Linear se aplicável) — quem revisa precisa ver o que vai
+entrar na PR, não descobrir depois do merge.
 
 Se a recomendação **for** "Bloquear merge": não monte fechamento
 nenhum. A spec só fecha numa próxima rodada de review, depois que os
@@ -244,7 +248,8 @@ Deseja:
   [1] Submeter este review ao GitHub exatamente como está. [Se o
       fechamento foi montado na Etapa 5:] Inclui o fechamento da
       feature (state/roadmap/decisions-log/docs) para entrar nesta
-      mesma PR.
+      mesma PR. [Se houver `linear_issue_id`:] Também publica o
+      comentário de fechamento no card do Linear.
   [2] Editar/remover comentários antes de submeter
   [3] Cancelar (não submeter nada)
 
@@ -321,6 +326,11 @@ Ao mesmo tempo, como o evento já foi determinado acima, o fechamento só
    relatório completo em `<SPECS_DIR>/review-pr-[N].md`, mesma branch
    da PR (branch já checked out no passo 1). Se não houver (PR fora do
    pipeline): pule este passo.
+7. Se o evento **não** for `REQUEST_CHANGES` e houver `linear_issue_id`:
+   publique o comentário de fechamento redigido na Etapa 5 via skill
+   `linear-sync` (seção "Fechamento", passo 2). Se o evento for
+   `REQUEST_CHANGES`: **nenhuma escrita no Linear** — mesma regra do
+   passo 2 acima para o fechamento da feature.
 
 Quando o usuário mergear a PR, o fechamento já commitado nela se torna
 efetivo junto com o código — nenhuma ação adicional necessária.
@@ -368,6 +378,8 @@ nova + PR:
   repetições.
 - **Reconheça o bom**: o resumo executivo deve mencionar o que foi bem
   feito.
-- **NUNCA submeter ao GitHub sem aprovação explícita do usuário** —
-  esta é a regra mais importante deste comando, e não é configurável
-  por `MODO_EXECUCAO`.
+- **NUNCA submeter ao GitHub — nem publicar no Linear — sem aprovação
+  explícita do usuário** — esta é a regra mais importante deste
+  comando, e não é configurável por `MODO_EXECUCAO`. Vale igualmente
+  para a escrita no GitHub (Etapa 7) e para o comentário de fechamento
+  no card do Linear (Etapa 7, passo 7), quando aplicável.

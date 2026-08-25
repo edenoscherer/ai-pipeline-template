@@ -102,7 +102,11 @@ então prossiga. Registre o resultado em
    `phases_completed`, `current_phase` → `review`, atualize
    `last_updated`.
 2. Commit final garantindo que tudo está salvo.
-3. Se `MODO_EXECUCAO: encadeado` e houver PR automatizada configurada
+3. Aplique a skill `linear-sync` (seção "Write-back de progresso"),
+   incluindo `task_progress` e `quality_gates_status` no comentário —
+   sem efeito se `linear_issue_id` for `null` ou a integração não
+   estiver disponível.
+4. Se `MODO_EXECUCAO: encadeado` e houver PR automatizada configurada
    no projeto, prossiga para abertura de PR; caso contrário, reporte a
    conclusão e aguarde o usuário abrir a PR manualmente ou pedir
    `/review-pr`.
@@ -118,7 +122,9 @@ infira essa condição sozinho: uma task falhando (Passo 2) já para a
 execução e reporta por conta própria; marcar `failed` no estado é
 decisão do usuário, não automática. Atualize a linha no
 `ARQUIVO_ROADMAP` (se configurado) com o símbolo correspondente (ver
-legenda em `.pipeline/roadmap.md`), reporte e pare.
+legenda em `.pipeline/roadmap.md`), aplique a skill `linear-sync`
+(seção "Estados de exceção" — sem efeito se `linear_issue_id` for
+`null` ou a integração não estiver disponível), reporte e pare.
 
 Priorize entrega de qualidade, testes passando e aderência total à
 spec, ao plano e às regras do projeto.
