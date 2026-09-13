@@ -164,9 +164,14 @@ responde uma pergunta diferente: **"como este módulo funciona hoje?"**
 - **Feature nova** → adiciona/atualiza comportamento no doc do domínio.
 - **Bug fix** → corrige o texto que descrevia o comportamento errado,
   e remove de "Limitações conhecidas" o que foi resolvido.
+- **Melhoria técnica** (`🔧`) → refatoração, melhoria de performance,
+  débito técnico ou hardening; atualiza a seção relevante sem alterar
+  "Limitações conhecidas" (salvo se resolver uma limitação listada) e sem
+  disparar alerta de recorrência.
 - **Tabela "Specs Relacionadas"** em cada doc de domínio funciona como
   índice de recorrência: se dois bug fixes na mesma área aparecem ali,
-  é sinal de causa raiz não resolvida na primeira tentativa.
+  é sinal de causa raiz não resolvida na primeira tentativa (entradas de
+  melhoria técnica são ignoradas para este alerta).
 
 **Detecção automática de recorrência**: `/specify-tech` consulta essa
 tabela **antes** de investigar um bug novo. Se encontrar um bug fix
@@ -329,7 +334,7 @@ projeto-alvo.
 
 /specify <descrição da feature>          → spec.md
 /specify-tech <descrição de bug/débito>  → spec técnica (alternativa ao /specify)
-/plan                                     → research.md, data-model.md, contracts/
+/plan                                     → plan.md (central), research.md, data-model.md, contracts/
 /tasks                                    → tasks.md
 /implement                                → código + commits + quality gates
 /review-pr <número da PR>                 → review + aprovação humana + merge tracking

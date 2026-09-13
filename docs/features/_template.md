@@ -40,10 +40,11 @@ causa raiz documentada lá pode não ter sido de fato eliminada.
 
 | # | Spec | Tipo | Resumo | Data |
 |---|------|------|--------|------|
-| <NNN> | [<NNN>-<slug>](../../specs/<NNN>-<slug>/) | ✨ Feature / 🐛 Bug fix | <resumo em 1 linha> | AAAA-MM-DD |
+| <NNN> | [<NNN>-<slug>](../../specs/<NNN>-<slug>/) | ✨ Feature / 🐛 Bug fix / 🔧 Melhoria técnica | <resumo em 1 linha> | AAAA-MM-DD |
 
 <!-- Exemplo (apagar ao usar):
 | 021 | [021-fix-rounding](../../specs/021-fix-rounding/) | 🐛 Bug fix | Corrigido arredondamento em cálculo de margem para categorias com desconto | 2026-07-14 |
+| 019 | [019-cache-optimization](../../specs/019-cache-optimization/) | 🔧 Melhoria técnica | Implementado cache em memória para consultas de preço | 2026-06-10 |
 | 017 | [017-margin-calc](../../specs/017-margin-calc/) | ✨ Feature | Introduzido cálculo de margem híbrido por categoria | 2026-05-02 |
 | 012 | [012-fix-price-precision](../../specs/012-fix-price-precision/) | 🐛 Bug fix | Corrigido erro de precisão decimal em preços com 3+ casas | 2026-03-19 |
 -->
