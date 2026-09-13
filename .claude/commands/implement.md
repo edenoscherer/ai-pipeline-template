@@ -104,7 +104,8 @@ revisado.
 1. Atualize `<ESTADO_DIR>/<slug>.json`: `implement` →
    `phases_completed`, `current_phase` → `review`, atualize
    `last_updated`.
-2. Commit final garantindo que tudo está salvo.
+2. Commit final garantindo que tudo está salvo (arquivos de estado e
+   documentação da feature, sem alterações de código da aplicação).
 3. Se `MODO_EXECUCAO: encadeado` e houver PR automatizada configurada
    no projeto, prossiga para abertura de PR; caso contrário, reporte a
    conclusão e aguarde o usuário abrir a PR manualmente ou pedir

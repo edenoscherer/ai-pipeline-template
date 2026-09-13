@@ -134,12 +134,25 @@ review_judgment:
   produzida por este pipeline). **Antes de reaproveitar**
   `quality_gates_status`, compare `quality_gates_commit` do estado com
   o SHA atual do head da PR (`pull_request_read` method=`get`, campo
-  `head.sha`). Se divergirem, ou se `quality_gates_commit` for `null`/não
-  existir, trate cada gate como `not_run` no relatório (nunca `pass`) e
-  sinalize no resumo e no diagnóstico que os quality gates precisam ser
-  reexecutados contra o head atual antes do merge. Nunca infira ou
-  assuma um valor aqui — um gate não definido no projeto, ou não
-  executado contra o commit atual, é `not_run`, nunca `pass`.
+  `head.sha`):
+  - Se forem **iguais**: reaproveite o status diretamente.
+  - Se **divergirem**: verifique se os commits entre `quality_gates_commit`
+    e o head da PR (`git diff --name-only <quality_gates_commit>..<head.sha>`)
+    alteraram apenas metadados do pipeline e documentação (arquivos em
+    `<ESTADO_DIR>/`, `specs/`, `.pipeline/`), sem tocar nenhum código de
+    aplicação. Se **nenhum código de aplicação foi alterado** (por
+    exemplo, apenas o commit de fechamento de fase do `/implement`),
+    o resultado dos gates continua válido para o código e pode ser
+    reaproveitado.
+  - Se **houve alteração em código de aplicação** após
+    `quality_gates_commit`, ou se `quality_gates_commit` for `null`/não
+    existir: trate cada gate como `not_run` no relatório (nunca `pass`)
+    e sinalize no resumo e no diagnóstico que o código foi modificado
+    após os testes e os gates precisam ser reexecutados contra o head
+    atual antes do merge.
+  Nunca infira ou assuma um valor aqui — um gate não definido no projeto,
+  ou cujo código foi modificado após a última execução, é `not_run`,
+  nunca `pass`.
 - **`review_judgment`** reflete a **avaliação do revisor** sobre os
   quatro eixos analisados na Etapa 4. `flagged` = há pelo menos um
   problema relevante identificado naquele eixo (ver comentários por
