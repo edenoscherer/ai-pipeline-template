@@ -82,7 +82,7 @@ observabilidade que o Dev deve respeitar.
    `current_phase` → `tasks`, atualize `last_updated`.
 2. Se `COMMIT_POR_FASE: true`:
    ```bash
-   git add <feature_dir>/
+   git add <feature_dir>/ <ESTADO_DIR>/<slug>.json
    git commit -m "docs(<slug>): add implementation plan"
    ```
 3. Se `MODO_EXECUCAO: encadeado`, avance para `/tasks`. Caso contrário,

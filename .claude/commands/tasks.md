@@ -76,7 +76,7 @@ Todo conteúdo em `IDIOMA_ARTEFATOS`.
    (`task_progress.completed` e `task_progress.failed` começam em `0`).
 2. Se `COMMIT_POR_FASE: true`:
    ```bash
-   git add <feature_dir>/tasks.md
+   git add <feature_dir>/tasks.md <ESTADO_DIR>/<slug>.json
    git commit -m "docs(<slug>): add tasks"
    ```
 3. Se `MODO_EXECUCAO: encadeado`, avance para `/implement`. Caso
