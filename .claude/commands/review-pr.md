@@ -131,9 +131,15 @@ review_judgment:
 - **`quality_gates`** reflete **evidência mecânica**: o resultado real
   de rodar os comandos definidos em `ARQUIVO_QUALITY_GATES` (ou o que
   `/implement` já registrou em `quality_gates_status`, se a PR foi
-  produzida por este pipeline). Nunca infira ou assuma um valor aqui —
-  um gate não definido no projeto, ou não executado, é `not_run`,
-  nunca `pass`.
+  produzida por este pipeline). **Antes de reaproveitar**
+  `quality_gates_status`, compare `quality_gates_commit` do estado com
+  o SHA atual do head da PR (`pull_request_read` method=`get`, campo
+  `head.sha`). Se divergirem, ou se `quality_gates_commit` for `null`/não
+  existir, trate cada gate como `not_run` no relatório (nunca `pass`) e
+  sinalize no resumo e no diagnóstico que os quality gates precisam ser
+  reexecutados contra o head atual antes do merge. Nunca infira ou
+  assuma um valor aqui — um gate não definido no projeto, ou não
+  executado contra o commit atual, é `not_run`, nunca `pass`.
 - **`review_judgment`** reflete a **avaliação do revisor** sobre os
   quatro eixos analisados na Etapa 4. `flagged` = há pelo menos um
   problema relevante identificado naquele eixo (ver comentários por

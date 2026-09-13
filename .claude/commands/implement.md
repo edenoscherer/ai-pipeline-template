@@ -85,8 +85,11 @@ não foi preenchido pelo projeto">
 
 Execute os comandos definidos em `ARQUIVO_QUALITY_GATES`
 (`.pipeline/quality-gates.md`). Se algum falhar: corrija, reexecute, só
-então prossiga. Registre o resultado em
-`<ESTADO_DIR>/<slug>.json` → `quality_gates_status`.
+então prossiga. Registre o resultado em `<ESTADO_DIR>/<slug>.json`:
+atualize `quality_gates_status` e grave `quality_gates_commit` com o
+SHA atual (`git rev-parse HEAD`), para que `/review-pr` possa verificar
+se os gates foram executados contra o mesmo commit que está sendo
+revisado.
 
 ## Passo 4 — Checklist de conclusão (gate)
 

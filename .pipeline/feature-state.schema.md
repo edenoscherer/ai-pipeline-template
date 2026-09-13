@@ -30,6 +30,7 @@ conversa/memória quando o estado já existir.
     "lint": null,
     "build": null
   },
+  "quality_gates_commit": null,
   "task_progress": {
     "total": null,
     "completed": 0,
@@ -52,6 +53,7 @@ conversa/memória quando o estado já existir.
 | `clarifications_asked` | number | Total de perguntas de clarificação já feitas nesta feature (soma entre specify/specify-tech) |
 | `last_updated` | string (ISO 8601) | Timestamp da última atualização do estado |
 | `quality_gates_status` | object | Resultado do último gate rodado por `/implement`, um por linha de `ARQUIVO_QUALITY_GATES` (`typecheck`/`test`/`lint`/`build`, ou o subconjunto que o projeto de fato tiver): `null` (não rodado), `"pass"` ou `"fail"` |
+| `quality_gates_commit` | string \| null | SHA do commit contra o qual `quality_gates_status` foi apurado pela última vez (`null` se nenhum gate foi executado ainda) |
 | `task_progress` | object | Progresso de execução de `tasks.md`, independente de `current_phase`. `total`: nº de tasks geradas por `/tasks` (`null` antes disso). `completed`: incrementado por `/implement` a cada task marcada `[X]`. `failed`: incrementado quando uma task falha |
 
 ## Regras de uso
