@@ -85,8 +85,11 @@ não foi preenchido pelo projeto">
 
 Execute os comandos definidos em `ARQUIVO_QUALITY_GATES`
 (`.pipeline/quality-gates.md`). Se algum falhar: corrija, reexecute, só
-então prossiga. Registre o resultado em
-`<ESTADO_DIR>/<slug>.json` → `quality_gates_status`.
+então prossiga. Registre o resultado em `<ESTADO_DIR>/<slug>.json`:
+atualize `quality_gates_status` e grave `quality_gates_commit` com o
+SHA atual (`git rev-parse HEAD`), para que `/review-pr` possa verificar
+se os gates foram executados contra o mesmo commit que está sendo
+revisado.
 
 ## Passo 4 — Checklist de conclusão (gate)
 
@@ -101,7 +104,8 @@ então prossiga. Registre o resultado em
 1. Atualize `<ESTADO_DIR>/<slug>.json`: `implement` →
    `phases_completed`, `current_phase` → `review`, atualize
    `last_updated`.
-2. Commit final garantindo que tudo está salvo.
+2. Commit final garantindo que tudo está salvo (arquivos de estado e
+   documentação da feature, sem alterações de código da aplicação).
 3. Se `MODO_EXECUCAO: encadeado` e houver PR automatizada configurada
    no projeto, prossiga para abertura de PR; caso contrário, reporte a
    conclusão e aguarde o usuário abrir a PR manualmente ou pedir

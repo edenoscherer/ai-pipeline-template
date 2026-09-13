@@ -39,11 +39,11 @@ Slug ou número da feature. Se ausente, use a feature ativa em
 ### 1. Identificar o tipo de spec e o domínio afetado
 
 - Leia `<ESTADO_DIR>/<slug>.json` → `feature_dir`.
-- Determine o tipo pela estrutura de `spec.md`: seções
-  "Problema"/"Comportamento Atual vs. Esperado" indicam spec técnica
-  (via `/specify-tech`, provavelmente bug fix); seções "Cenários de
-  Uso"/"Requisitos Funcionais" indicam spec de produto (via
-  `/specify`, provavelmente feature nova).
+- Determine o tipo pela estrutura e conteúdo de `spec.md`:
+  - Seções "Cenários de Uso"/"Requisitos Funcionais" indicam **spec de produto** (via `/specify`): classifique como `✨ Feature`.
+  - Seções "Problema"/"Comportamento Atual vs. Esperado" indicam **spec técnica** (via `/specify-tech`). **Atenção:** spec técnica não é sinônimo de bug fix. Leia o conteúdo do problema:
+    - Se descreve um defeito real ou comportamento incorreto a corrigir: classifique como `🐛 Bug fix`.
+    - Se descreve refatoração, melhoria de performance, pagamento de débito técnico ou hardening de segurança sem defeito associado: classifique como `🔧 Melhoria técnica`.
 - Identifique o(s) domínio(s) afetado(s): olhe `data-model.md` e
   `contracts/` da feature (entidades e endpoints tocados costumam
   indicar o módulo). Se não for possível inferir com confiança,
@@ -58,28 +58,33 @@ Para cada domínio afetado, em `DOCS_FEATURES_DIR/<dominio>.md`:
   Comportamentos-chave, Contrato de API, Limitações conhecidas, Specs
   Relacionadas).
 - **Se existir**:
-  - **Spec de produto** (feature nova): adicione ou atualize a seção
+  - **Spec de produto** (`✨ Feature`): adicione ou atualize a seção
     "Comportamentos-chave e regras de negócio" com o que foi
     introduzido. Não reescreva seções não afetadas.
-  - **Spec técnica** (bug fix): corrija o texto da seção que descrevia
+  - **Bug fix** (`🐛 Bug fix`): corrija o texto da seção que descrevia
     o comportamento incorretamente. Se o bug estava listado em
     "Limitações conhecidas", remova a entrada — não deixe limitação
     "fantasma" depois de corrigida.
+  - **Melhoria técnica** (`🔧 Melhoria técnica`): atualize a seção
+    relevante (ex.: arquitetura, comportamento interno ou regras)
+    sem mexer em "Limitações conhecidas", a menos que a melhoria resolva
+    uma limitação de fato listada lá.
 
 ### 3. Registrar na tabela "Specs Relacionadas"
 
 Adicione uma linha **no topo** da tabela (mais recente primeiro):
 
 ```
-| <NNN> | [<NNN>-<slug>](<caminho relativo para SPECS_DIR>/<NNN>-<slug>/) | <✨ Feature ou 🐛 Bug fix> | <resumo em 1 linha> | <data de hoje> |
+| <NNN> | [<NNN>-<slug>](<caminho relativo para SPECS_DIR>/<NNN>-<slug>/) | <✨ Feature, 🐛 Bug fix ou 🔧 Melhoria técnica> | <resumo em 1 linha> | <data de hoje> |
 ```
 
 ### 4. Verificação de recorrência (só para bug fix)
 
-Se a spec sendo sincronizada for um bug fix, verifique se já existem
-outras entradas 🐛 Bug fix na mesma tabela **antes** desta. Se houver
-uma ou mais, e o resumo indicar área/sintoma semelhante, adicione uma
-nota logo abaixo da tabela:
+Se a spec sendo sincronizada for um bug fix (`🐛 Bug fix`), verifique se
+já existem outras entradas `🐛 Bug fix` na mesma tabela **antes** desta
+(ignore entradas `✨ Feature` e `🔧 Melhoria técnica`). Se houver uma ou
+mais, e o resumo indicar área/sintoma semelhante, adicione uma nota logo
+abaixo da tabela:
 
 ```
 > ⚠ Possível padrão recorrente: ver também <NNN-slug-anterior>. Se
@@ -92,12 +97,15 @@ nota logo abaixo da tabela:
 ## Checklist de conclusão (gate)
 
 - [ ] Domínio(s) afetado(s) identificado(s) corretamente
+- [ ] Tipo de spec classificado corretamente (✨ Feature, 🐛 Bug fix ou 🔧 Melhoria técnica)
 - [ ] Atualização foi incremental — não regenerou o documento inteiro
 - [ ] Linha nova adicionada em "Specs Relacionadas", no topo, com link
       relativo correto
 - [ ] Se bug fix: limitação/comportamento incorreto anterior foi
       removido ou corrigido no texto, não apenas anotado como resolvido
-- [ ] Se houver padrão recorrente detectado (Passo 4), nota adicionada
+- [ ] Se melhoria técnica: limitações conhecidas preservadas intactas
+      (exceto se explicitamente resolvidas)
+- [ ] Se houver padrão recorrente detectado (Passo 4, exclusivo para bug fix), nota adicionada
 
 ---
 

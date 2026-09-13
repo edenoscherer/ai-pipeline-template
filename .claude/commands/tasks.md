@@ -26,15 +26,14 @@ e reporte exatamente qual falhou — não prossiga nem tente adivinhar.
 2. `<ESTADO_DIR>/<slug>.json` existe para esta feature?
 3. `current_phase` não é `blocked`/`cancelled`/`failed`?
 4. `phases_completed` inclui `plan`?
-5. Pelo menos um artefato de design do `/plan` existe em `feature_dir`
-   (`research.md`, `data-model.md`, `contracts/` ou `quickstart.md`)?
+5. `plan.md` existe em `feature_dir`?
 
 Se alguma condição falhar, reporte assim:
 ```
 ❌ Não é possível executar /tasks.
 <motivo específico — ex.: "current_phase é tasks, mas /plan ainda não
-foi concluído" ou "nenhum artefato de design encontrado em
-<feature_dir> — rode /plan primeiro">
+foi concluído" ou "plan.md não encontrado em <feature_dir> — rode /plan
+primeiro">
 ```
 
 ## Passo 1 — Carregar contexto
@@ -76,7 +75,7 @@ Todo conteúdo em `IDIOMA_ARTEFATOS`.
    (`task_progress.completed` e `task_progress.failed` começam em `0`).
 2. Se `COMMIT_POR_FASE: true`:
    ```bash
-   git add <feature_dir>/tasks.md
+   git add <feature_dir>/tasks.md <ESTADO_DIR>/<slug>.json
    git commit -m "docs(<slug>): add tasks"
    ```
 3. Se `MODO_EXECUCAO: encadeado`, avance para `/implement`. Caso

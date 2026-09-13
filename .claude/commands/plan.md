@@ -47,8 +47,16 @@ encontrado em <feature_dir>">
 
 ## Passo 2 — Gerar artefatos de design
 
-Produza no diretório da feature (o que for aplicável ao tipo de
-projeto — nem todo projeto precisa de todos):
+Produza no diretório da feature:
+
+- **plan.md** — **obrigatório**, o documento central da fase:
+  estrutura da solução técnica, módulos e arquivos afetados, estratégia
+  de implementação e ordem de execução em alto nível. É o artefato lido
+  pelo `/tasks` para quebrar em tarefas e pelo `/implement` para
+  orientar o desenvolvimento.
+
+E os artefatos de apoio aplicáveis ao tipo de projeto (nem todo projeto
+precisa de todos):
 - **research.md** — decisões técnicas fundamentadas, alternativas
   consideradas e por que foram rejeitadas. Deixe, ao final, um
   cabeçalho vazio `## Decisões durante a implementação` — o
@@ -70,11 +78,13 @@ observabilidade que o Dev deve respeitar.
 
 - [ ] Conformidade com `ARQUIVO_REGRAS` e `ARQUIVO_ARQUITETURA`
       verificada
-- [ ] Artefatos aplicáveis gerados (research, data-model, contracts,
-      quickstart)
+- [ ] `plan.md` gerado como documento central (estrutura da solução,
+      módulos afetados, ordem de execução em alto nível)
+- [ ] Artefatos de apoio aplicáveis gerados (research, data-model,
+      contracts, quickstart)
 - [ ] Segurança considerada no desenho; sem violações evidentes
-- [ ] Contratos e modelo de dados suficientes para a fase de Tasks
-      gerar trabalho executável
+- [ ] Contratos, modelo de dados e plano suficientes para a fase de
+      Tasks gerar trabalho executável
 
 ## Passo 5 — Fechamento de fase
 
@@ -82,7 +92,7 @@ observabilidade que o Dev deve respeitar.
    `current_phase` → `tasks`, atualize `last_updated`.
 2. Se `COMMIT_POR_FASE: true`:
    ```bash
-   git add <feature_dir>/
+   git add <feature_dir>/ <ESTADO_DIR>/<slug>.json
    git commit -m "docs(<slug>): add implementation plan"
    ```
 3. Se `MODO_EXECUCAO: encadeado`, avance para `/tasks`. Caso contrário,

@@ -51,7 +51,7 @@ Todos rodam como comando direto, deliberadamente **não** como subagent — o pi
 |---|---|---|---|
 | `/specify` | Product Owner — o *quê/por quê*, nunca o *como* | `spec.md` | `plan` |
 | `/specify-tech` | Spec técnica para bugs/débito técnico/refatoração — checa `docs/features/<dominio>.md` por recorrência antes de tratar um bug como novo | `spec.md` técnica | `plan` |
-| `/plan` | Arquiteto — o *como*, validado contra `ARQUIVO_REGRAS`/`ARQUIVO_ARQUITETURA` | `research.md`, `data-model.md`, `contracts/`, `quickstart.md` | `tasks` |
+| `/plan` | Arquiteto — o *como*, validado contra `ARQUIVO_REGRAS`/`ARQUIVO_ARQUITETURA` | `plan.md` (central), `research.md`, `data-model.md`, `contracts/`, `quickstart.md` | `tasks` |
 | `/tasks` | QA/Tech Lead — quebra o plano em tasks ordenadas e testáveis (Setup → Testes → Core → Integração → Polish, ordem TDD, `[P]` para paralelizável); grava `task_progress.total` no estado | `tasks.md` | `implement` |
 | `/implement` | Dev — executa as tasks em ordem, comita por task, roda quality gates, atualiza `task_progress.completed`/`.failed`, registra decisões não previstas em `research.md` | código + commits | `review` |
 | `/review-pr` | Revisor sênior — **sempre** exige aprovação humana explícita antes de escrever no GitHub, independente do `MODO_EXECUCAO`; Etapa 5 separa evidência mecânica (`quality_gates`) de julgamento do revisor (`review_judgment`) num bloco estruturado, e monta o fechamento da feature (estado/roadmap/decisions-log/docs-sync) para entrar como commit na própria PR; Etapa 7 commita esse fechamento e submete o review (nunca `event=APPROVE` — autoaprovação retorna 422); Etapa 8 é só fallback para PRs mergeadas fora deste fluxo | review + rastreio de merge | `done` |
