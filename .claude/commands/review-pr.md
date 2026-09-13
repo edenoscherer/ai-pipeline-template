@@ -32,7 +32,7 @@ e reporte exatamente qual falhou — não prossiga nem tente adivinhar.
      contribuição externa). Reporte `⚠ PR fora do pipeline — nenhum
      estado de feature associado à branch <branch>` e siga com o review
      normalmente — apenas sem montar/commitar o fechamento da feature
-     (Etapa 5, subseção de fechamento; Etapa 7, passos 1 e 6), que
+     (Etapa 5, subseção de fechamento; Etapa 7, passos 1 e 2), que
      dependem de estado.
    - **Se existir**, verifique também:
      4. `current_phase` não é `blocked`/`cancelled`/`failed`?
@@ -299,34 +299,41 @@ qualquer edição de comentários já foi refletida na recomendação final
   normalmente e deve ser usado — é o que satisfaz uma branch protection
   que exige aprovação humana real.
 
-A ordem abaixo escreve o fechamento (se houver) **antes** de submeter o
-review, não depois — para o review submetido refletir exatamente o
-que vai para o head da PR, e não ficar potencialmente marcado como
-stale/dismissed por um push de fechamento feito depois da submissão.
-Ao mesmo tempo, como o evento já foi determinado acima, o fechamento só
-é escrito quando o evento não é `REQUEST_CHANGES` — nunca commitamos
-`done`/✅ para descobrir depois que o review bloqueia o merge.
+A ordem abaixo escreve o fechamento (se houver) e o relatório de review
+**antes** de submeter o review, não depois — para o review submetido
+refletir exatamente o que vai para o head final da PR, e não ficar
+marcado como stale/dismissed por um push posterior à submissão (em
+repositórios com "dismiss stale approvals on push" habilitado). Ao mesmo
+tempo, como o evento já foi determinado acima, o fechamento só é escrito
+quando o evento não é `REQUEST_CHANGES` — nunca commitamos `done`/✅ para
+descobrir depois que o review bloqueia o merge. Nenhum commit ou push é
+feito após a submissão do review.
 
 1. Se houver `<ESTADO_DIR>/<slug>.json` associado à PR: checkout da
    branch da PR. Faça isso independentemente de a Etapa 5 ter redigido
-   um fechamento — o passo 6 abaixo (commit do relatório) também
-   precisa da branch já checked out.
-2. Se o evento **não** for `REQUEST_CHANGES` e a Etapa 5 tiver redigido
-   um fechamento: escreva o conteúdo redigido nos arquivos
-   correspondentes (branch já checked out no passo 1), `git commit -m
-   "docs(<slug>): mark feature as complete"`, push. Se o evento for
-   `REQUEST_CHANGES`: **não escreva nem commite nada do fechamento** —
-   a feature só fecha numa próxima rodada, depois de corrigido e
-   revisado de novo.
+   um fechamento — a escrita do relatório também precisa da branch já
+   checked out.
+2. Se houver `<ESTADO_DIR>/<slug>.json` associado à PR:
+   - Se o evento **não** for `REQUEST_CHANGES` e a Etapa 5 tiver
+     redigido um fechamento: escreva o conteúdo redigido nos arquivos
+     correspondentes (fechamento da feature) e escreva o relatório
+     completo em `<SPECS_DIR>/review-pr-[N].md`. Faça o commit e push
+     juntos (ou em dois commits consecutivos, mas ambos antes do passo
+     3): `git commit -m "docs(<slug>): mark feature as complete and add review report"`,
+     push.
+   - Se o evento for `REQUEST_CHANGES`: **não escreva nem commite nada
+     do fechamento** — a feature só fecha numa próxima rodada, depois de
+     corrigido e revisado de novo. Escreva apenas o relatório em
+     `<SPECS_DIR>/review-pr-[N].md`, commit (`git commit -m "docs(<slug>): add review report"`)
+     e push.
+   - Se não houver `<ESTADO_DIR>/<slug>.json` associado (PR fora do
+     pipeline): pule este passo.
 3. Criar review pendente: `pull_request_review_write` method=`create`
 4. Adicionar comentários por arquivo/linha:
    `add_comment_to_pending_review`
 5. Submeter: `pull_request_review_write` method=`submit_pending`,
-   `event=<determinado no início desta etapa>`.
-6. Se houver `<ESTADO_DIR>/<slug>.json` associado: commit e push do
-   relatório completo em `<SPECS_DIR>/review-pr-[N].md`, mesma branch
-   da PR (branch já checked out no passo 1). Se não houver (PR fora do
-   pipeline): pule este passo.
+   `event=<determinado no início desta etapa>`. **Nenhum push depois
+   deste passo.**
 
 Quando o usuário mergear a PR, o fechamento já commitado nela se torna
 efetivo junto com o código — nenhuma ação adicional necessária.
